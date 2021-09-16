@@ -1,14 +1,33 @@
-# Copyright 2021 Balbir Thomas
+# Copyright 2021 Canonical Ltd.
 # See LICENSE file for licensing details.
-#
-# TEMPLATE-TODO: change this example to suit your needs.
-# If you don't need a config, you can remove the file entirely.
-# It ties in to the example _on_config_changed handler in src/charm.py
 #
 # Learn more about config at: https://juju.is/docs/sdk/config
 
 options:
-  thing:
-    default: 🎁
-    description: A thing used by the charm.
+  scrape-interval:
+    description: Frequency at which metrics are scraped.
     type: string
+  scrape-timeout:
+    description: Timeout interval when scraping a job.
+    type: string
+  proxy-url:
+    description: Proxy URL for accessing metrics endpoints.
+    type: string
+  relabel-configs:
+    description: YAML string formatted scrape target relabeling configuration.
+    type: string
+  metrics-relabel-configs: 
+    description: YAML string formatted metrics relabeling configuration.
+    type: string
+  sample-limit:
+    description: Maximum number of samples per scrape (0=unlimited)
+    type: int
+  label-limit:
+    description: Maximum number of labels per scrape (0=unlimited)
+    type: int
+  label-name-length-limit:
+    description: Maximum length of label name (0=unlimited)
+    type: int
+  label-value-length-limit:
+    description: Maximum lenght of label value (0=unlimited)
+    type: int

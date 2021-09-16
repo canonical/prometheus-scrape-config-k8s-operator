@@ -1,23 +1,30 @@
-# Copyright 2021 Balbir Thomas
+# Copyright 2021 Canonical Ltd.
 # See LICENSE file for licensing details.
 
 # For a complete list of supported options, see:
 # https://discourse.charmhub.io/t/charm-metadata-v2/3674/15
 name: prometheus-scrape-config
 display-name: |
-  TEMPLATE-TODO: fill out a display name for the Charmcraft store
-description: |
-  TEMPLATE-TODO: fill out the charm's description
+  prometheus-scrape-config-k8s
 summary: |
-  TEMPLATE-TODO: fill out the charm's summary
-
-# TEMPLATE-TODO: replace with containers for your workload (delete for non-k8s)
+  A set of Prometheus scrape configuration options
+description: |
+  This charm provides a reusable unit of Prometheus
+  scrape job configuration options. By interposing
+  this charm between a scraped target and the Prometheus
+  charm, configurations in scrape jobs submitted by the
+  target can be overriden by the Juju configuration
+  options set for this charm.
+requires:
+  configurable-scrape-jobs:
+    interface: prometheus_scrape
+provides:
+  metrics-endpoint:
+    interface: prometheus_scrape
 containers:
-  httpbin:
-    resource: httpbin-image
-
-# TEMPLATE-TODO: each container defined above must specify an oci-image resource
+  unused:
+    resource: unused-image
 resources:
-  httpbin-image:
+  unused-image:
     type: oci-image
-    description: OCI image for httpbin (kennethreitz/httpbin)
+    description: Unused OCI image for scrape config charm
