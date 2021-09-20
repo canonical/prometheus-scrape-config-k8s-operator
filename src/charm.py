@@ -43,7 +43,6 @@ class PrometheusScrapeConfigCharm(CharmBase):
 
         # manages configuration changes for this charm
         self.framework.observe(self.on.config_changed, self._update_prometheus_jobs)
-        self.framework.observe(self.on.show_config_action, self._on_show_config_action)
 
     def _set_prometheus_jobs(self, event):
         """Set Prometheus scrape configuration for all targets.
@@ -75,11 +74,6 @@ class PrometheusScrapeConfigCharm(CharmBase):
 
             groups = list(self._metrics_consumer.alerts().values())
             relation.data[self.app]["alert_rules"] = json.dumps({"groups": groups})
-
-    def _on_show_config_action(self, event):
-        """Show current set of configured options.
-        """
-        event.set_results(self._config)
 
     @property
     def _config(self):
