@@ -3,9 +3,9 @@
 
 # For a complete list of supported options, see:
 # https://discourse.charmhub.io/t/charm-metadata-v2/3674/15
-name: prometheus-scrape-config
+name: prometheus-scrape-config-k8s
 display-name: |
-  prometheus-scrape-config-k8s
+  Prometheus Scrape Config
 summary: |
   A set of Prometheus scrape configuration options
 description: |
