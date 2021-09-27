@@ -14,7 +14,7 @@ between a scrape target and the Prometheus charm.
 An example of how to use the scrape configuration operator to configure
 scrape jobs for a Cassandra charm is shown below.
 
-```
+```sh
 $ juju deploy prometheus-k8s      # Deploys Prometheus
 $ juju deploy cassandra-k8s       # Deploys Cassandra
 
