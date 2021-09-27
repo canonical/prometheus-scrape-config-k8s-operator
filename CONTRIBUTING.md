@@ -12,6 +12,21 @@ pip install -r requirements-dev.txt
 
 ## Testing
 
-The Python operator framework includes a very nice harness for testing
-operator behaviour without full deployment.
+The test setup is based on `tox`.
+The following runs linter and unit tests:
 
+```sh
+tox
+```
+
+If you want to run only the linter, run:
+
+```
+tox -e lint
+```
+
+Similarly, the unit tests are run with:
+
+```sh
+tox -e unit
+```
