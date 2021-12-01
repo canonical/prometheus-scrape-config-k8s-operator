@@ -23,7 +23,7 @@ class TestCharm(unittest.TestCase):
         """Ensure one downstream is updated correctly."""
         self.harness.set_leader(True)
 
-        self.harness.update_config({"scrape-interval": "1s"})
+        self.harness.update_config({"scrape_interval": "1s"})
 
         upstream_rel_id = self.harness.add_relation("configurable-scrape-jobs", "cassandra-k8s")
         self.harness.add_relation_unit(upstream_rel_id, "cassandra-k8s/0")
@@ -65,7 +65,7 @@ class TestCharm(unittest.TestCase):
         """Ensure multiple downstreams are updated correctly."""
         self.harness.set_leader(True)
 
-        self.harness.update_config({"scrape-interval": "1s"})
+        self.harness.update_config({"scrape_interval": "1s"})
 
         upstream_rel_id = self.harness.add_relation("configurable-scrape-jobs", "cassandra-k8s")
         self.harness.add_relation_unit(upstream_rel_id, "cassandra-k8s/0")
@@ -120,7 +120,7 @@ class TestCharm(unittest.TestCase):
         """Ensure multiple upstream jobs are passed on correctly."""
         self.harness.set_leader(True)
 
-        self.harness.update_config({"scrape-interval": "1s"})
+        self.harness.update_config({"scrape_interval": "1s"})
 
         upstream_rel_id = self.harness.add_relation("configurable-scrape-jobs", "cassandra-k8s-1")
         self.harness.add_relation_unit(upstream_rel_id, "cassandra-k8s-1/0")
