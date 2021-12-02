@@ -4,30 +4,30 @@
 # Learn more about config at: https://juju.is/docs/sdk/config
 
 options:
-  scrape-interval:
+  scrape_interval:
     description: Frequency at which metrics are scraped.
     type: string
-  scrape-timeout:
+  scrape_timeout:
     description: Timeout interval when scraping a job.
     type: string
-  proxy-url:
+  proxy_url:
     description: Proxy URL for accessing metrics endpoints.
     type: string
-  relabel-configs:
+  relabel_configs:
     description: YAML string formatted scrape target relabeling configuration.
     type: string
-  metrics-relabel-configs: 
+  metrics_relabel_configs:
     description: YAML string formatted metrics relabeling configuration.
     type: string
-  sample-limit:
+  sample_limit:
     description: Maximum number of samples per scrape (0=unlimited)
     type: int
-  label-limit:
+  label_limit:
     description: Maximum number of labels per scrape (0=unlimited)
     type: int
-  label-name-length-limit:
+  label_name_length_limit:
     description: Maximum length of label name (0=unlimited)
     type: int
-  label-value-length-limit:
+  label_value_length_limit:
     description: Maximum lenght of label value (0=unlimited)
     type: int

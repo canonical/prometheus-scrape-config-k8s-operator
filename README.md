@@ -12,12 +12,12 @@ $ juju deploy cassandra-k8s       # Deploys Cassandra
 
 # Deploys the prometheus-scrape-configuration, specifying a custom scrape interval valid only for the
 # scrape job forwarded to prometheus-k8s through its relation with this charm
-$ juju deploy prometheus-scrape-configuration-k8s scrape-interval-config --config scrape-interval=20s  
+$ juju deploy prometheus-scrape-configuration-k8s scrape-interval-config --config scrape_interval=20s
 
 # Link cassandra as scrape target, so that Cassandra’s address is used as a
 # static_configs in the scrape job
-$ juju relate cassandra-k8s scrape-interval-config  
-$ juju relate scrape-interval-config prometheus-k8s  
+$ juju relate cassandra-k8s scrape-interval-config
+$ juju relate scrape-interval-config prometheus-k8s
 ```
 
 ## Relations
