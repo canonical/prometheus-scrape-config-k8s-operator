@@ -29,5 +29,5 @@ options:
     description: Maximum length of label name (0=unlimited)
     type: int
   label_value_length_limit:
-    description: Maximum lenght of label value (0=unlimited)
+    description: Maximum length of label value (0=unlimited)
     type: int
