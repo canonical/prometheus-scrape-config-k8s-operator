@@ -157,7 +157,11 @@ class TestCharm(unittest.TestCase):
         )
 
         downstream1_rel_id = self.harness.add_relation("metrics-endpoint", "prometheus-k8s-1")
+        self.harness.add_relation_unit(downstream1_rel_id, "prometheus-k8s-2/0")
+
         downstream2_rel_id = self.harness.add_relation("metrics-endpoint", "prometheus-k8s-2")
+        self.harness.add_relation_unit(downstream2_rel_id, "prometheus-k8s-2/1")
+
         # Check that is does not really matter whether we have units
         # on Prometheus side
 
