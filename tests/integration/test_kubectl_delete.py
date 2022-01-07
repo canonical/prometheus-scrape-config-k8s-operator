@@ -3,7 +3,6 @@
 # See LICENSE file for licensing details.
 
 
-import json
 import logging
 from pathlib import Path
 
@@ -15,11 +14,7 @@ logger = logging.getLogger(__name__)
 
 METADATA = yaml.safe_load(Path("./metadata.yaml").read_text())
 app_name = METADATA["name"]
-config = {
-    "scrape_jobs": json.dumps(
-        [{"metrics_path": "/metrics", "static_configs": [{"targets": ["*:9500"]}]}]
-    )
-}
+config = {"scrape_interval": "15s", "scrape_timeout": "10s"}
 
 
 @pytest.mark.abort_on_fail

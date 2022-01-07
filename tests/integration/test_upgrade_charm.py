@@ -3,7 +3,6 @@
 # See LICENSE file for licensing details.
 
 
-import json
 import logging
 from pathlib import Path
 
@@ -24,11 +23,7 @@ async def test_deploy_from_edge_and_upgrade_from_local_path(ops_test, charm_unde
     resources = {"unused-image": METADATA["resources"]["unused-image"]["upstream-source"]}
     await ops_test.model.deploy(f"ch:{app_name}", application_name=app_name, channel="edge")
 
-    config = {
-        "scrape_jobs": json.dumps(
-            [{"metrics_path": "/metrics", "static_configs": [{"targets": ["*:9500"]}]}]
-        )
-    }
+    config = {"scrape_interval": "15s", "scrape_timeout": "10s"}
     await ops_test.model.applications[app_name].set_config(config)
     await ops_test.model.wait_for_idle(apps=[app_name], status="active", timeout=1000)
 
