@@ -57,7 +57,7 @@ ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
 module = ["charms.prometheus_k8s.*"]
-follow_imports = false
+follow_imports = "silent"
 
 [tool.pytest.ini_options]
 minversion = "6.0"

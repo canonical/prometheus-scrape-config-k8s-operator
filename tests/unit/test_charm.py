@@ -4,6 +4,7 @@
 # Learn more about testing at: https://juju.is/docs/sdk/testing
 
 import json
+import typing
 import unittest
 
 from ops.model import ActiveStatus, BlockedStatus
@@ -46,12 +47,14 @@ class TestCharm(unittest.TestCase):
             ActiveStatus(),
         )
 
-        self.assertEqual(
-            json.loads(
-                self.harness.get_relation_data(downstream_rel_id, self.harness.model.app.name).get(
-                    "scrape_jobs"
-                )
+        scrape_jobs = typing.cast(
+            str,
+            self.harness.get_relation_data(downstream_rel_id, self.harness.model.app.name).get(
+                "scrape_jobs"
             ),
+        )
+        self.assertEqual(
+            json.loads(scrape_jobs),
             [
                 {
                     "metrics_path": "/metrics",
@@ -99,20 +102,25 @@ class TestCharm(unittest.TestCase):
             }
         ]
 
-        self.assertEqual(
-            json.loads(
-                self.harness.get_relation_data(
-                    downstream1_rel_id, self.harness.model.app.name
-                ).get("scrape_jobs")
+        scrape_jobs = typing.cast(
+            str,
+            self.harness.get_relation_data(downstream1_rel_id, self.harness.model.app.name).get(
+                "scrape_jobs"
             ),
-            expected_scrape_jobs,
         )
         self.assertEqual(
-            json.loads(
-                self.harness.get_relation_data(
-                    downstream2_rel_id, self.harness.model.app.name
-                ).get("scrape_jobs")
+            json.loads(scrape_jobs),
+            expected_scrape_jobs,
+        )
+
+        scrape_jobs = typing.cast(
+            str,
+            self.harness.get_relation_data(downstream2_rel_id, self.harness.model.app.name).get(
+                "scrape_jobs"
             ),
+        )
+        self.assertEqual(
+            json.loads(scrape_jobs),
             expected_scrape_jobs,
         )
 
@@ -180,20 +188,25 @@ class TestCharm(unittest.TestCase):
             },
         ]
 
-        self.assertEqual(
-            json.loads(
-                self.harness.get_relation_data(
-                    downstream1_rel_id, self.harness.model.app.name
-                ).get("scrape_jobs")
+        scrape_jobs = typing.cast(
+            str,
+            self.harness.get_relation_data(downstream1_rel_id, self.harness.model.app.name).get(
+                "scrape_jobs"
             ),
-            expected_scrape_jobs,
         )
         self.assertEqual(
-            json.loads(
-                self.harness.get_relation_data(
-                    downstream2_rel_id, self.harness.model.app.name
-                ).get("scrape_jobs")
+            json.loads(scrape_jobs),
+            expected_scrape_jobs,
+        )
+
+        scrape_jobs = typing.cast(
+            str,
+            self.harness.get_relation_data(downstream2_rel_id, self.harness.model.app.name).get(
+                "scrape_jobs"
             ),
+        )
+        self.assertEqual(
+            json.loads(scrape_jobs),
             expected_scrape_jobs,
         )
 
