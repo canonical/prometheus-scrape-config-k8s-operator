@@ -25,6 +25,7 @@ async def test_deploy_from_local_path(ops_test, charm_under_test):
     resources = {"unused-image": METADATA["resources"]["unused-image"]["upstream-source"]}
     await ops_test.model.deploy(charm_under_test, application_name=app_name, resources=resources)
 
+    # set some custom configs to later check they persisted across the test
     await ops_test.model.applications[app_name].set_config(config)
     await ops_test.model.wait_for_idle(apps=[app_name], status="blocked", timeout=1000)
 
