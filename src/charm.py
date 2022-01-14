@@ -150,12 +150,8 @@ class PrometheusScrapeConfigCharm(CharmBase):
             logger.debug("Updated metrics consumer %s", consumer_relation.app)
 
     @property
-    def _config(self):
-        return {key.replace("-", "_"): value for key, value in self.model.config.items()}
-
-    @property
     def _prometheus_configurations(self):
-        config = self._config
+        config = self.model.config.items()
 
         configured_jobs = [
             # Using kwargs to merge in place
