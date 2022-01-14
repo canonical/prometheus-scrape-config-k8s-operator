@@ -78,10 +78,16 @@ class PrometheusScrapeConfigCharm(CharmBase):
         # Ensure we refresh scrape jobs on charm upgrade
         self.framework.observe(self.on.upgrade_charm, self._update_all_metrics_consumers)
 
-    def _has_metrics_provider_relations(self):
+    def _has_metrics_providers(self):
         return (
             self._metrics_provider_relation_name not in self.model.relations
             or not self.model.relations[self._metrics_provider_relation_name]
+        )
+
+    def _has_metrics_consumers(self):
+        return (
+            self._metrics_consumer_relation_name not in self.model.relations
+            or not self.model.relations[self._metrics_consumer_relation_name]
         )
 
     def _on_metrics_provider_relation_broken(self, _):
@@ -89,7 +95,7 @@ class PrometheusScrapeConfigCharm(CharmBase):
         if not self.unit.is_leader():
             return
 
-        if not self._has_metrics_provider_relations():
+        if not self._has_metrics_providers():
             self.unit.status = BlockedStatus("missing metrics provider")
             return
         # TODO: Should we update all metrics consumers here ?
@@ -99,7 +105,7 @@ class PrometheusScrapeConfigCharm(CharmBase):
         if not self.unit.is_leader():
             return
 
-        if not self._has_metrics_provider_relations():
+        if not self._has_metrics_providers():
             self.unit.status = BlockedStatus("missing metrics provider")
             return
 
@@ -116,10 +122,7 @@ class PrometheusScrapeConfigCharm(CharmBase):
         if not self.unit.is_leader():
             return
 
-        if (
-            "metrics-endpoint" not in self.model.relations
-            or not self.model.relations["metrics-endpoint"]
-        ):
+        if not self._has_metrics_consumers():
             self.unit.status = BlockedStatus("missing metrics consumer")
             return
 
@@ -163,13 +166,6 @@ class PrometheusScrapeConfigCharm(CharmBase):
         alert_groups = list(self._metrics_providers.alerts().values())
 
         return {"scrape_jobs": configured_jobs, "alert_rules": {"groups": alert_groups}}
-
-    @property
-    def _metrics_consumer_relations(self):
-        if self._metrics_consumer_relation_name in self.model.relations:
-            return self.model.relations[self._metrics_consumer_relation_name]
-
-        return []
 
 
 if __name__ == "__main__":
