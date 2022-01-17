@@ -112,7 +112,7 @@ class PrometheusScrapeConfigCharm(CharmBase):
             "Forwarding scrape jobs and alert rules for new metrics consumers"
         )
 
-        self._update_metrics_consumer_relations([event.relation])
+        self._update_metrics_consumer_relation(event.relation)
 
         self.unit.status = ActiveStatus()
 
@@ -129,13 +129,14 @@ class PrometheusScrapeConfigCharm(CharmBase):
             "Updating scrape jobs and alert rules for all metrics consumer"
         )
 
-        self._update_metrics_consumer_relations(self.model.relations[self._metrics_consumer_relation_name])
+        for relation in self.model.relations[self._metrics_consumer_relation_name]:
+            self._update_metrics_consumer_relation(relation)
 
         self.unit.status = ActiveStatus()
 
-    def _update_metrics_consumer_relations(self, metrics_consumer_relations):
-        if not metrics_consumer_relations:
-            logger.debug("empty list of metrics consumer relations")
+    def _update_metrics_consumer_relation(self, metrics_consumer_relation):
+        if not metrics_consumer_relation:
+            logger.debug("no metrics consumer relation provided")
             return
 
         prometheus_configurations = self._prometheus_configurations
@@ -143,10 +144,9 @@ class PrometheusScrapeConfigCharm(CharmBase):
         scrape_jobs = json.dumps(prometheus_configurations["scrape_jobs"])
         alert_rules = json.dumps(prometheus_configurations["alert_rules"])
 
-        for consumer_relation in metrics_consumer_relations:
-            consumer_relation.data[self.app]["scrape_jobs"] = scrape_jobs
-            consumer_relation.data[self.app]["alert_rules"] = alert_rules
-            logger.debug("Updated metrics consumer %s", consumer_relation.app)
+        metrics_consumer_relation.data[self.app]["scrape_jobs"] = scrape_jobs
+        metrics_consumer_relation.data[self.app]["alert_rules"] = alert_rules
+        logger.debug("Updated metrics consumer %s", metrics_consumer_relation.app)
 
     @property
     def _prometheus_configurations(self):
