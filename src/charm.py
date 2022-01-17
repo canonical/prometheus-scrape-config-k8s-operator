@@ -79,14 +79,14 @@ class PrometheusScrapeConfigCharm(CharmBase):
 
     def _has_metrics_providers(self):
         return (
-            self._metrics_provider_relation_name not in self.model.relations
-            or not self.model.relations[self._metrics_provider_relation_name]
+            self._metrics_provider_relation_name in self.model.relations
+            and self.model.relations[self._metrics_provider_relation_name]
         )
 
     def _has_metrics_consumers(self):
         return (
-            self._metrics_consumer_relation_name not in self.model.relations
-            or not self.model.relations[self._metrics_consumer_relation_name]
+            self._metrics_consumer_relation_name in self.model.relations
+            and self.model.relations[self._metrics_consumer_relation_name]
         )
 
     def _on_metrics_provider_relation_broken(self, _):
