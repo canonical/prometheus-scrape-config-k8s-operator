@@ -157,9 +157,9 @@ class PrometheusScrapeConfigCharm(CharmBase):
             job.update(config)
             configured_jobs.append(job)
 
-        alert_groups = list(self._metrics_providers.alerts().values())
+        alerts = self._metrics_providers.alerts()
 
-        return {"scrape_jobs": configured_jobs, "alert_rules": {"groups": alert_groups}}
+        return {"scrape_jobs": configured_jobs, "alert_rules": alerts}
 
 
 if __name__ == "__main__":
