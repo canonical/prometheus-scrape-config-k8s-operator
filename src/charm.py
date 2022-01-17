@@ -15,7 +15,6 @@ through the 'metrics-endpoint' relation using the
 
 import json
 import logging
-from copy import deepcopy
 
 from charms.prometheus_k8s.v0.prometheus_scrape import MetricsEndpointConsumer
 from ops.charm import CharmBase
@@ -153,11 +152,10 @@ class PrometheusScrapeConfigCharm(CharmBase):
     def _prometheus_configurations(self):
         config = self.model.config.items()
 
-        configured_jobs = [
-            # Using kwargs to merge in place
-            {**deepcopy(job), **config}
-            for job in self._metrics_providers.jobs()
-        ]
+        configured_jobs = []
+        for job in self._metrics_providers.jobs():
+            job.update(config)
+            configured_jobs.append(job)
 
         alert_groups = list(self._metrics_providers.alerts().values())
 
