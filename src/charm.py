@@ -150,6 +150,9 @@ class PrometheusScrapeConfigCharm(CharmBase):
 
     def _update_metrics_consumer_relation(self, metrics_consumer_relation):
         """Ensure that a specific metrics consumer's job specifications are updated."""
+        if not self.unit.is_leader():
+            return
+
         if not metrics_consumer_relation:
             logger.debug("no metrics consumer relation provided")
             return
