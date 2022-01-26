@@ -228,7 +228,7 @@ class TestCharm(unittest.TestCase):
 
         self.assertEqual(
             self.harness.model.unit.status,
-            BlockedStatus("downstream relations missing"),
+            BlockedStatus("missing metrics consumer"),
         )
 
     def test_no_upstreams(self):
@@ -240,5 +240,5 @@ class TestCharm(unittest.TestCase):
 
         self.assertEqual(
             self.harness.model.unit.status,
-            BlockedStatus("upstream relations missing"),
+            BlockedStatus("missing metrics provider"),
         )
