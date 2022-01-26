@@ -103,15 +103,16 @@ class PrometheusScrapeConfigCharm(CharmBase):
             and self.model.relations[self._metrics_consumer_relation_name]
         )
 
-    def _on_metrics_provider_relation_broken(self, _):
+    def _on_metrics_provider_relation_broken(self, event):
         """Block the charm when no charms contribute scrape jobs."""
         if not self.unit.is_leader():
             return
 
-        if not self._has_metrics_providers():
-            self.unit.status = BlockedStatus("missing metrics provider")
+        if not self._has_metrics_consumers():
+            self.unit.status = BlockedStatus("missing metrics consumers")
             return
-        # TODO: Should we update all metrics consumers here ?
+
+        self._update_all_metrics_consumers(event)
 
     def _update_new_metrics_consumer(self, event):
         """Set Prometheus scrape configuration for all targets."""
