@@ -8,7 +8,7 @@
 
 The Prometheus Scrape Configuration charm
 allows overriding configuration of scrape jobs
-from any metrics provider the provides these metrics
+from any metrics provider that provides these metrics
 through the 'metrics-endpoint' relation using the
 `prometheus_scrape` interface.
 """
@@ -38,7 +38,9 @@ class PrometheusScrapeConfigCharm(CharmBase):
         """Construct the charm."""
         super().__init__(*args)
 
+        # Scrape jobs are obtained over this relation
         self._metrics_provider_relation_name = "configurable-scrape-jobs"
+        # Scrape jobs are forwarded to a "metrics consumer" such as Prometheus over this relation
         self._metrics_consumer_relation_name = "metrics-endpoint"
 
         # Use a metrics consumer object to manage relations with all metrics provider charms
@@ -76,12 +78,26 @@ class PrometheusScrapeConfigCharm(CharmBase):
         self.framework.observe(self.on.upgrade_charm, self._update_all_metrics_consumers)
 
     def _has_metrics_providers(self):
+        """Are any metrics providers available.
+
+        Returns
+        -------
+            True if at least one metrics provider is related to this charm,
+            False otherwise.
+        """
         return (
             self._metrics_provider_relation_name in self.model.relations
             and self.model.relations[self._metrics_provider_relation_name]
         )
 
     def _has_metrics_consumers(self):
+        """Are any metrics consumers available.
+
+        Returns
+        -------
+            True if at least one metrics consumer is related to this charm,
+            False otherwise.
+        """
         return (
             self._metrics_consumer_relation_name in self.model.relations
             and self.model.relations[self._metrics_consumer_relation_name]
@@ -133,6 +149,7 @@ class PrometheusScrapeConfigCharm(CharmBase):
         self.unit.status = ActiveStatus()
 
     def _update_metrics_consumer_relation(self, metrics_consumer_relation):
+        """Ensure that a specific metrics consumer's job specifications are updated."""
         if not metrics_consumer_relation:
             logger.debug("no metrics consumer relation provided")
             return
@@ -148,6 +165,17 @@ class PrometheusScrapeConfigCharm(CharmBase):
 
     @property
     def _prometheus_configurations(self):
+        """Fetch all scrape jobs with updated configuration.
+
+        This method transforms all scrape jobs provided by related
+        metrics consumers, using configuration items set in this
+        charm. The scrape jobs (including associated alert rules)
+        are returned.
+
+        Returns
+        -------
+            A dictionary with keys "scrape_jobs" and "alert_rules".
+        """
         config = self.model.config.items()
 
         configured_jobs = []
