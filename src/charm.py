@@ -45,7 +45,9 @@ class PrometheusScrapeConfigCharm(CharmBase):
         # related to this charm. Note the metrics consumer object in this charm also acts
         # as the metrics provider for other metrics consumer charms related with this charm,
         # hence we label the metrics consumer object in this charm as the `_metrics_providers`.
-        self._metrics_providers = MetricsEndpointConsumer(self, self._metrics_provider_relation_name)
+        self._metrics_providers = MetricsEndpointConsumer(
+            self, self._metrics_provider_relation_name
+        )
 
         # when list of metrics providers change notify all metrics consumers
         self.framework.observe(
@@ -155,10 +157,7 @@ class PrometheusScrapeConfigCharm(CharmBase):
 
         alerts = list(self._metrics_providers.alerts().values())
 
-        return {
-            "scrape_jobs": configured_jobs,
-            "alert_rules": alerts[0] if alerts else []
-        }
+        return {"scrape_jobs": configured_jobs, "alert_rules": alerts[0] if alerts else []}
 
 
 if __name__ == "__main__":
