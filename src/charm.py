@@ -67,10 +67,6 @@ class PrometheusScrapeConfigCharm(CharmBase):
             self.on[self._metrics_consumer_relation_name].relation_created,
             self._update_new_metrics_consumer,
         )
-        self.framework.observe(
-            self.on[self._prometheus_relation_name].relation_joined,
-            self._set_jobs_to_new_downstream,
-        )
 
         # manages configuration changes for this charm
         self.framework.observe(self.on.config_changed, self._update_all_metrics_consumers)
