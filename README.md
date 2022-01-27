@@ -27,12 +27,6 @@ $ juju relate scrape-interval-config prometheus-k8s
 - A `metrics-endpoint` relation with one or more Charms that implement the
   `MetricsEndpointConsumer`, such as the [Prometheus](https://charmhub.io/prometheus-k8s) charm.
 
-## OCI Images
-
-This charm does not need an actual workload: it simply adjusts and forwards relation data.
-However, [Juju does need at least one workload container](https://bugs.launchpad.net/juju/+bug/1928991),
-which is why this charm declares an effectively unused container with a base Ubuntu LTS 20.04 image.
-
 ## Contributing
 
 Please see the [Juju SDK docs](https://juju.is/docs/sdk) for guidelines 
