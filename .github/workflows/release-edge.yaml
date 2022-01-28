@@ -73,15 +73,11 @@ jobs:
         run: |
           echo "::set-output name=rev::$(charmcraft status prometheus-scrape-config-k8s | grep edge | awk '{printf "%s", $NF}')"
       - name: Create tag
-        uses: actions/github-script@v5
+        uses: actions/create-release@v1
         with:
-          script: |
-            github.rest.createRelease({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              tag_name: 'rev${{ steps.revision.outputs.rev }}',
-              name: 'Revision ${{ steps.revision.outputs.rev }}',
-              draft: false,
-              prerelease: false,
-              generate_release_notes: true
-            })
+          draft: false
+          prerelease: false
+          release_name: Revision ${{ steps.revision.outputs.rev }}
+          tag_name: rev${{ steps.revision.outputs.rev }}
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
