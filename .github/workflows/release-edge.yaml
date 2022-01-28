@@ -67,4 +67,4 @@ jobs:
       - name: Upload to edge channel
         uses: canonical/charmhub-upload-action@0.2.0
         with:
-          credentials: "${{ secrets.CHARMCRAFT_AUTH }}"
+          credentials: "${{ secrets.CHARMHUB_TOKEN }}"
