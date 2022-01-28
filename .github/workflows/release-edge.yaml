@@ -68,3 +68,16 @@ jobs:
         uses: canonical/charmhub-upload-action@0.2.0
         with:
           credentials: "${{ secrets.CHARMHUB_TOKEN }}"
+      - name: Get Revision ID
+        id: revision
+        run: |
+          echo "::set-output name=rev::rev-$(charmcraft status prometheus-scrape-config-k8s | grep edge | awk '{printf "%s", $NF}')"
+      - name: Create tag
+        uses: actions/create-release@v1
+        with:
+          draft: false
+          prerelease: false
+          release_name: ${{ steps.revision.outputs.rev }}
+          tag_name: ${{ steps.revision.outputs.rev }}
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
