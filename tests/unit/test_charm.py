@@ -7,7 +7,7 @@ import json
 import typing
 import unittest
 
-from ops.model import ActiveStatus, BlockedStatus
+from ops.model import ActiveStatus, BlockedStatus, WaitingStatus
 from ops.testing import Harness
 
 from charm import PrometheusScrapeConfigCharm
@@ -18,7 +18,7 @@ class TestCharm(unittest.TestCase):
         """Flake8 forces me to write meaningless docstrings."""
         self.harness = Harness(PrometheusScrapeConfigCharm)
         self.addCleanup(self.harness.cleanup)
-        self.harness.begin()
+        self.harness.begin_with_initial_hooks()
 
     def test_change_scrape_interval(self):
         """Ensure one downstream is updated correctly."""
@@ -241,4 +241,37 @@ class TestCharm(unittest.TestCase):
         self.assertEqual(
             self.harness.model.unit.status,
             BlockedStatus("missing metrics provider"),
+        )
+
+    def test_unused_unit_sets_waiting_status_by_default(self):
+        """Ensure that a inactive unit sets waiting status by default."""
+        self.harness.set_leader(False)
+
+        self.assertEqual(
+            self.harness.model.unit.status,
+            WaitingStatus("inactive unit"),
+        )
+
+    def test_unused_unit_sets_waiting_status_on_provider_joined(self):
+        """Ensure that a inactive unit sets waiting status on provider joined ."""
+        self.harness.set_leader(False)
+
+        upstream_rel_id = self.harness.add_relation("configurable-scrape-jobs", "cassandra-k8s")
+        self.harness.add_relation_unit(upstream_rel_id, "cassandra-k8s/0")
+
+        self.assertEqual(
+            self.harness.model.unit.status,
+            WaitingStatus("inactive unit"),
+        )
+
+    def test_unused_unit_sets_waiting_status_on_consumer_joined(self):
+        """Ensure that a inactive unit sets waiting status on consumer joined."""
+        self.harness.set_leader(False)
+
+        upstream_rel_id = self.harness.add_relation("metrics-endpoint", "prometheus-k8s")
+        self.harness.add_relation_unit(upstream_rel_id, "prometheus-k8s/0")
+
+        self.assertEqual(
+            self.harness.model.unit.status,
+            WaitingStatus("inactive unit"),
         )

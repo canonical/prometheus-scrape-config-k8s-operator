@@ -19,7 +19,7 @@ import logging
 from charms.prometheus_k8s.v0.prometheus_scrape import MetricsEndpointConsumer
 from ops.charm import CharmBase
 from ops.main import main
-from ops.model import ActiveStatus, BlockedStatus, MaintenanceStatus
+from ops.model import ActiveStatus, BlockedStatus, MaintenanceStatus, WaitingStatus
 
 logger = logging.getLogger(__name__)
 
@@ -106,6 +106,7 @@ class PrometheusScrapeConfigCharm(CharmBase):
     def _on_metrics_provider_relation_broken(self, event):
         """Block the charm when no charms contribute scrape jobs."""
         if not self.unit.is_leader():
+            self.unit.status = WaitingStatus("inactive unit")
             return
 
         if not self._has_metrics_consumers():
@@ -116,7 +117,10 @@ class PrometheusScrapeConfigCharm(CharmBase):
 
     def _update_new_metrics_consumer(self, event):
         """Set Prometheus scrape configuration for all targets."""
+        logger.debug("Updating new metrics consumer")
+
         if not self.unit.is_leader():
+            self.unit.status = WaitingStatus("inactive unit")
             return
 
         if not self._has_metrics_providers():
@@ -133,7 +137,10 @@ class PrometheusScrapeConfigCharm(CharmBase):
 
     def _update_all_metrics_consumers(self, _):
         """Update all scrape configuration jobs for all metrics consumers."""
+        logger.debug("Updating all metrics consumers")
+
         if not self.unit.is_leader():
+            self.unit.status = WaitingStatus("inactive unit")
             return
 
         if not self._has_metrics_consumers():
@@ -152,6 +159,7 @@ class PrometheusScrapeConfigCharm(CharmBase):
     def _update_metrics_consumer_relation(self, metrics_consumer_relation):
         """Ensure that a specific metrics consumer's job specifications are updated."""
         if not self.unit.is_leader():
+            self.unit.status = WaitingStatus("inactive unit")
             return
 
         if not metrics_consumer_relation:
