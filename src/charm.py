@@ -200,7 +200,10 @@ class PrometheusScrapeConfigCharm(CharmBase):
         for entry in alerts:
             alert_groups["groups"] = alert_groups["groups"] + entry["groups"]
 
-        return {"scrape_jobs": configured_jobs, "alert_rules": alert_groups if alerts else []}
+        return {
+            "scrape_jobs": configured_jobs,
+            "alert_rules": alert_groups if alert_groups["groups"] else {},
+        }
 
 
 if __name__ == "__main__":
