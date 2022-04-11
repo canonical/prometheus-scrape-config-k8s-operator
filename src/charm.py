@@ -198,7 +198,7 @@ class PrometheusScrapeConfigCharm(CharmBase):
         alerts = list(self._metrics_providers.alerts().values())
         alert_groups = {"groups": []}  # type: ignore
         for entry in alerts:
-            alert_groups["groups"] = alert_groups["groups"] + entry["groups"]
+            alert_groups["groups"] += entry["groups"]
 
         return {
             "scrape_jobs": configured_jobs,
