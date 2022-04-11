@@ -275,3 +275,48 @@ class TestCharm(unittest.TestCase):
             self.harness.model.unit.status,
             WaitingStatus("inactive unit"),
         )
+
+    def test_alert_rules(self):
+        self.harness.set_leader(True)
+        prom_rel_id = self.harness.add_relation("metrics-endpoint", "prometheus-k8s")
+        workload_rel_id = self.harness.add_relation("configurable-scrape-jobs", "cassandra-k8s")
+        self.harness.add_relation_unit(workload_rel_id, "cassandra-k8s/0")
+        self.harness.update_relation_data(
+            workload_rel_id,
+            "cassandra-k8s",
+            {
+                "scrape_jobs": json.dumps(
+                    [{"metrics_path": "/metrics", "static_configs": [{"targets": ["*:9500"]}]}]
+                ),
+                "alert_rules": json.dumps({
+                    "groups": [{
+                        "name": "test_alert",
+                        "rules": [{
+                            "alert": "alert",
+                            "labels": {
+                                "juju_model": "test_model",
+                                "juju_model_uuid": "test_uuid",
+                                "juju_application": "test_app",
+                                "juju_charm": "test_charm"
+                            }
+                        }]
+                    }]
+                })
+            },
+        )
+        app_name = self.harness.model.app.name
+        prom_rules = json.loads(self.harness.get_relation_data(prom_rel_id, app_name).get("alert_rules"))
+        self.assertDictEqual(prom_rules, {
+            "groups": [{
+                "name": "test_alert",
+                "rules": [{
+                    "alert": "alert",
+                    "labels": {
+                        "juju_model": "test_model",
+                        "juju_model_uuid": "test_uuid",
+                        "juju_application": "test_app",
+                        "juju_charm": "test_charm"
+                    }
+                }]
+            }]
+        })
