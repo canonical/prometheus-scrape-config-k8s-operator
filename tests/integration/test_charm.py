@@ -36,7 +36,7 @@ async def test_relate(ops_test):
 
 async def test_alert_rules_exist(ops_test):
     rules = await get_prometheus_rules(ops_test=ops_test, app_name=PROM_NAME, unit_num=0)
-    assert len(rules) > 0
+    assert len(rules) > 0, "No alert rules are present even though spring music is related"
 
 
 async def test_multiple_workloads_alert_rules(ops_test):
@@ -47,5 +47,4 @@ async def test_multiple_workloads_alert_rules(ops_test):
     await ops_test.model.add_relation(APP_NAME, "spring-music2")
     await ops_test.model.wait_for_idle(status="active")
     new_rules = await get_prometheus_rules(ops_test=ops_test, app_name=PROM_NAME, unit_num=0)
-    # Ensure that adding a second workload creates new alert rules.
-    assert len(new_rules) > len(old_rules)
+    assert len(new_rules) > len(old_rules), "Additional workload instance did not add alert rules"
