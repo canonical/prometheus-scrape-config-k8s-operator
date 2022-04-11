@@ -288,35 +288,50 @@ class TestCharm(unittest.TestCase):
                 "scrape_jobs": json.dumps(
                     [{"metrics_path": "/metrics", "static_configs": [{"targets": ["*:9500"]}]}]
                 ),
-                "alert_rules": json.dumps({
-                    "groups": [{
-                        "name": "test_alert",
-                        "rules": [{
-                            "alert": "alert",
-                            "labels": {
-                                "juju_model": "test_model",
-                                "juju_model_uuid": "test_uuid",
-                                "juju_application": "test_app",
-                                "juju_charm": "test_charm"
+                "alert_rules": json.dumps(
+                    {
+                        "groups": [
+                            {
+                                "name": "test_alert",
+                                "rules": [
+                                    {
+                                        "alert": "alert",
+                                        "labels": {
+                                            "juju_model": "test_model",
+                                            "juju_model_uuid": "test_uuid",
+                                            "juju_application": "test_app",
+                                            "juju_charm": "test_charm",
+                                        },
+                                    }
+                                ],
                             }
-                        }]
-                    }]
-                })
+                        ]
+                    }
+                ),
             },
         )
         app_name = self.harness.model.app.name
-        prom_rules = json.loads(self.harness.get_relation_data(prom_rel_id, app_name).get("alert_rules"))
-        self.assertDictEqual(prom_rules, {
-            "groups": [{
-                "name": "test_alert",
-                "rules": [{
-                    "alert": "alert",
-                    "labels": {
-                        "juju_model": "test_model",
-                        "juju_model_uuid": "test_uuid",
-                        "juju_application": "test_app",
-                        "juju_charm": "test_charm"
+        prom_rules = json.loads(
+            str(self.harness.get_relation_data(prom_rel_id, app_name).get("alert_rules"))
+        )
+        self.assertDictEqual(
+            prom_rules,
+            {
+                "groups": [
+                    {
+                        "name": "test_alert",
+                        "rules": [
+                            {
+                                "alert": "alert",
+                                "labels": {
+                                    "juju_model": "test_model",
+                                    "juju_model_uuid": "test_uuid",
+                                    "juju_application": "test_app",
+                                    "juju_charm": "test_charm",
+                                },
+                            }
+                        ],
                     }
-                }]
-            }]
-        })
+                ]
+            },
+        )
