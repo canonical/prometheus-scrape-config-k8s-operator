@@ -281,6 +281,8 @@ class TestCharm(unittest.TestCase):
         prom_rel_id = self.harness.add_relation("metrics-endpoint", "prometheus-k8s")
         workload_rel_id = self.harness.add_relation("configurable-scrape-jobs", "cassandra-k8s")
         self.harness.add_relation_unit(workload_rel_id, "cassandra-k8s/0")
+
+        # Set relation data on the "requires" side
         self.harness.update_relation_data(
             workload_rel_id,
             "cassandra-k8s",
@@ -310,6 +312,8 @@ class TestCharm(unittest.TestCase):
                 ),
             },
         )
+        
+        # Verify relation data on the "provides" side matches the "requires" side
         app_name = self.harness.model.app.name
         prom_rules = json.loads(
             str(self.harness.get_relation_data(prom_rel_id, app_name).get("alert_rules"))
