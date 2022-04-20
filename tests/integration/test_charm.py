@@ -22,7 +22,9 @@ async def test_dependencies(ops_test):
         ops_test.model.deploy("ch:spring-music", application_name=SPRING_NAME, channel="edge"),
         ops_test.model.deploy("ch:spring-music", application_name="spring-music2", channel="edge"),
     )
-    await ops_test.model.wait_for_idle(status="active", apps=[PROM_NAME, SPRING_NAME, "spring-music2"])
+    await ops_test.model.wait_for_idle(
+        status="active", apps=[PROM_NAME, SPRING_NAME, "spring-music2"]
+    )
 
 
 async def test_build_and_deploy(ops_test, charm_under_test):
