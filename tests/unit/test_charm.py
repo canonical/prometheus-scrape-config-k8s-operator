@@ -220,9 +220,9 @@ class TestCharm(unittest.TestCase):
             upstream_rel_id,
             "cassandra-k8s",
             {
-                "scrape_jobs": [
-                    {"metrics_path": "/metrics", "static_configs": [{"targets": ["*:9500"]}]}
-                ]
+                "scrape_jobs": json.dumps(
+                    [{"metrics_path": "/metrics", "static_configs": [{"targets": ["*:9500"]}]}]
+                )
             },
         )
 
