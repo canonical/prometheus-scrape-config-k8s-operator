@@ -18,7 +18,9 @@ ZINC_NAME = "zinc"
 @pytest.mark.abort_on_fail
 async def test_dependencies(ops_test):
     await asyncio.gather(
-        ops_test.model.deploy("ch:prometheus-k8s", application_name=PROM_NAME, channel="beta"),
+        ops_test.model.deploy(
+            "ch:prometheus-k8s", application_name=PROM_NAME, channel="beta", trust=True
+        ),
         ops_test.model.deploy("ch:zinc-k8s", application_name=ZINC_NAME, channel="edge"),
         ops_test.model.deploy("ch:zinc-k8s", application_name="zinc2", channel="edge"),
     )
