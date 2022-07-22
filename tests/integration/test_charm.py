@@ -24,7 +24,7 @@ async def test_dependencies(ops_test):
         ops_test.model.deploy("ch:zinc-k8s", application_name=ZINC_NAME, channel="edge"),
         ops_test.model.deploy("ch:zinc-k8s", application_name="zinc2", channel="edge"),
     )
-    await ops_test.model.wait_for_idle(status="active", apps=[PROM_NAME, ZINC_NAME, "zinc2"])
+    await ops_test.model.wait_for_idle(status="active")
 
 
 async def test_build_and_deploy(ops_test, charm_under_test):
