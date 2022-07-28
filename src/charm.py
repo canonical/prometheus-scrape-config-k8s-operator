@@ -64,9 +64,7 @@ class PrometheusScrapeConfigCharm(CharmBase):
         )
 
         # When a new consumer of the metrics-endpoint relation is related,
-        # pass it all the current scrape jobs. We register to both the relation
-        # being created and joined, because relation_created is not reliably sent
-        # over unit recreation.
+        # pass it all the current scrape jobs.
         self.framework.observe(
             self.on[self._metrics_consumer_relation_name].relation_created,
             self._update_new_metrics_consumer,
