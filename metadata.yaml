@@ -7,6 +7,7 @@ name: prometheus-scrape-config-k8s
 
 summary: |
   A set of Prometheus scrape configuration options
+
 description: |
   This charm provides a reusable unit of Prometheus
   scrape job configuration options. By interposing
@@ -14,9 +15,15 @@ description: |
   charm, configurations in scrape jobs submitted by the
   target can be overridden by the Juju configuration
   options set for this charm.
+
+website: https://charmhub.io/prometheus-scrape-config-k8s
+source: https://github.com/canonical/prometheus-scrape-config-k8s-operator
+issues: https://github.com/canonical/prometheus-scrape-config-k8s-operator/issues
+
 requires:
   configurable-scrape-jobs:
     interface: prometheus_scrape
+
 provides:
   metrics-endpoint:
     interface: prometheus_scrape
