@@ -25,10 +25,10 @@ logger = logging.getLogger(__name__)
 
 
 class PrometheusScrapeConfigCharm(CharmBase):
-    """PrometheusScrapeConfigCharm is a adapter charm.
+    """PrometheusScrapeConfigCharm is an adapter charm.
 
     PrometheusScrapeConfigCharm has no real workload. It
-    transforms incoming scrape jobs from metrics providers i.e scrape
+    transforms incoming scrape jobs from metrics providers i.e. scrape
     targets (e.g., charms that expose a metrics endpoint) and pushes them
     to metrics consumer charms (e.g., a Prometheus charm)
     that will execute the metrics scraping.

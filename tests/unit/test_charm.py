@@ -244,7 +244,7 @@ class TestCharm(unittest.TestCase):
         )
 
     def test_unused_unit_sets_waiting_status_by_default(self):
-        """Ensure that a inactive unit sets waiting status by default."""
+        """Ensure that an inactive unit sets waiting status by default."""
         self.harness.set_leader(False)
 
         self.assertEqual(
@@ -253,7 +253,7 @@ class TestCharm(unittest.TestCase):
         )
 
     def test_unused_unit_sets_waiting_status_on_provider_joined(self):
-        """Ensure that a inactive unit sets waiting status on provider joined ."""
+        """Ensure that an inactive unit sets waiting status on provider joined ."""
         self.harness.set_leader(False)
 
         upstream_rel_id = self.harness.add_relation("configurable-scrape-jobs", "cassandra-k8s")
@@ -265,7 +265,7 @@ class TestCharm(unittest.TestCase):
         )
 
     def test_unused_unit_sets_waiting_status_on_consumer_joined(self):
-        """Ensure that a inactive unit sets waiting status on consumer joined."""
+        """Ensure that an inactive unit sets waiting status on consumer joined."""
         self.harness.set_leader(False)
 
         upstream_rel_id = self.harness.add_relation("metrics-endpoint", "prometheus-k8s")
