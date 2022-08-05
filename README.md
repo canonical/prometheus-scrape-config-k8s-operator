@@ -1,8 +1,9 @@
 # Prometheus Scrape Config Operator
 
-The Prometheus scrape config operator enables you to apply a set of configurations
-to the scrape jobs provided by its upstream charms, and forward the modified scrape
-jobs downstream to one or more consumers that will actually perform the scraping.
+The Prometheus scrape config operator is an adapter charm that enables you to
+apply a set of configurations to the scrape jobs provided by its upstream
+charms, and forward the modified scrape jobs downstream to one or more
+consumers that will actually perform the scraping.
 
 ## Usage Example
 
@@ -29,6 +30,6 @@ $ juju relate scrape-interval-config prometheus-k8s
 
 ## Contributing
 
-Please see the [Juju SDK docs](https://juju.is/docs/sdk) for guidelines 
+Please see the [Juju SDK docs](https://juju.is/docs/sdk) for guidelines
 on enhancements to this charm following best practice guidelines, and
 `CONTRIBUTING.md` for developer guidance.
