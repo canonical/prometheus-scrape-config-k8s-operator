@@ -69,7 +69,7 @@ tox -e lint
 
 Unit tests are implemented using the Operator Framework test
 [harness](https://ops.readthedocs.io/en/latest/#module-ops.testing). These
-tests may executed by doing
+tests may be executed by doing
 
 ```bash
 $ tox -e unit

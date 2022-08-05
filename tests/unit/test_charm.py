@@ -7,6 +7,7 @@ import json
 import typing
 import unittest
 
+from charms.observability_libs.v0.juju_topology import JujuTopology
 from ops.model import ActiveStatus, BlockedStatus, WaitingStatus
 from ops.testing import Harness
 
@@ -14,17 +15,37 @@ from charm import PrometheusScrapeConfigCharm
 
 
 class TestCharm(unittest.TestCase):
+    @classmethod
+    def _scrape_metadata(cls, app_name: str):
+        """Scrape metadata for prometheus_scrape."""
+        return json.dumps(
+            JujuTopology(
+                model="model",
+                model_uuid="f2c1b2a6-e006-11eb-ba80-0242ac130004",
+                application=app_name,
+                unit="cassandra-k8s/0",
+                charm_name="cassandra-k8s",
+            ).as_dict()
+        )
+
+    @classmethod
+    def _unit_data(cls, app_name: str):
+        """Unit data for prometheus_scrape to translate star notation ("*:8000") correctly."""
+        return {
+            "prometheus_scrape_unit_address": "whatever.cluster.local",
+            "prometheus_scrape_unit_name": f"{app_name}/0",
+        }
+
     def setUp(self):
         """Flake8 forces me to write meaningless docstrings."""
         self.harness = Harness(PrometheusScrapeConfigCharm)
         self.addCleanup(self.harness.cleanup)
         self.harness.begin_with_initial_hooks()
+        self.harness.update_config({"scrape_interval": "1s"})
 
     def test_change_scrape_interval(self):
         """Ensure one downstream is updated correctly."""
         self.harness.set_leader(True)
-
-        self.harness.update_config({"scrape_interval": "1s"})
 
         upstream_rel_id = self.harness.add_relation("configurable-scrape-jobs", "cassandra-k8s")
         self.harness.add_relation_unit(upstream_rel_id, "cassandra-k8s/0")
@@ -34,41 +55,38 @@ class TestCharm(unittest.TestCase):
             {
                 "scrape_jobs": json.dumps(
                     [{"metrics_path": "/metrics", "static_configs": [{"targets": ["*:9500"]}]}]
-                )
+                ),
+                "scrape_metadata": self._scrape_metadata("cassandra-k8s-1"),
             },
+        )
+        self.harness.update_relation_data(
+            upstream_rel_id, "cassandra-k8s/0", self._unit_data("cassandra-k8s")
         )
 
         downstream_rel_id = self.harness.add_relation("metrics-endpoint", "prometheus-k8s")
         # Check that is does not really matter whether we have units
         # on Prometheus side
 
-        self.assertEqual(
-            self.harness.model.unit.status,
-            ActiveStatus(),
-        )
+        self.assertEqual(self.harness.model.unit.status, ActiveStatus())
 
-        scrape_jobs = typing.cast(
-            str,
-            self.harness.get_relation_data(downstream_rel_id, self.harness.model.app.name).get(
-                "scrape_jobs"
-            ),
-        )
+        app_data = self.harness.get_relation_data(downstream_rel_id, self.harness.model.app.name)
+        scrape_jobs = typing.cast(str, app_data["scrape_jobs"])
+        scrape_jobs = json.loads(scrape_jobs)
+
+        # From scrape-config's config option
+        self.assertEqual(scrape_jobs[0]["scrape_interval"], "1s")
+
+        # From upstream charm's app data
+        self.assertEqual(scrape_jobs[0]["metrics_path"], "/metrics")
+
+        # From upstream charm's app data (:9500) and unit data (whatever.cluster.local)
         self.assertEqual(
-            json.loads(scrape_jobs),
-            [
-                {
-                    "metrics_path": "/metrics",
-                    "scrape_interval": "1s",
-                    "static_configs": [{"targets": ["*:9500"]}],
-                }
-            ],
+            scrape_jobs[0]["static_configs"][0]["targets"], ["whatever.cluster.local:9500"]
         )
 
     def test_change_scrape_interval_multiple_downstreams(self):
         """Ensure multiple downstreams are updated correctly."""
         self.harness.set_leader(True)
-
-        self.harness.update_config({"scrape_interval": "1s"})
 
         upstream_rel_id = self.harness.add_relation("configurable-scrape-jobs", "cassandra-k8s")
         self.harness.add_relation_unit(upstream_rel_id, "cassandra-k8s/0")
@@ -77,58 +95,43 @@ class TestCharm(unittest.TestCase):
             "cassandra-k8s",
             {
                 "scrape_jobs": json.dumps(
-                    [
-                        {
-                            "metrics_path": "/metrics",
-                            "static_configs": [{"targets": ["*:9500"]}],
-                        }
-                    ]
-                )
+                    [{"metrics_path": "/metrics", "static_configs": [{"targets": ["*:9500"]}]}]
+                ),
+                "scrape_metadata": self._scrape_metadata("cassandra-k8s-1"),
             },
+        )
+        self.harness.update_relation_data(
+            upstream_rel_id, "cassandra-k8s/0", self._unit_data("cassandra-k8s")
         )
 
         downstream1_rel_id = self.harness.add_relation("metrics-endpoint", "prometheus-k8s-1")
         downstream2_rel_id = self.harness.add_relation("metrics-endpoint", "prometheus-k8s-2")
-        # Check that is does not really matter whether we have units
-        # on Prometheus side
+        # It does not really matter whether we have units on Prometheus side
 
         self.assertEqual(self.harness.model.unit.status, ActiveStatus())
 
-        expected_scrape_jobs = [
-            {
-                "metrics_path": "/metrics",
-                "scrape_interval": "1s",
-                "static_configs": [{"targets": ["*:9500"]}],
-            }
-        ]
+        for rel_id in [downstream1_rel_id, downstream2_rel_id]:
+            with self.subTest(rel_id=rel_id):
+                app_data = self.harness.get_relation_data(
+                    downstream1_rel_id, self.harness.model.app.name
+                )
+                scrape_jobs = typing.cast(str, app_data["scrape_jobs"])
+                scrape_jobs = json.loads(scrape_jobs)
 
-        scrape_jobs = typing.cast(
-            str,
-            self.harness.get_relation_data(downstream1_rel_id, self.harness.model.app.name).get(
-                "scrape_jobs"
-            ),
-        )
-        self.assertEqual(
-            json.loads(scrape_jobs),
-            expected_scrape_jobs,
-        )
+                # From scrape-config's config option
+                self.assertEqual(scrape_jobs[0]["scrape_interval"], "1s")
 
-        scrape_jobs = typing.cast(
-            str,
-            self.harness.get_relation_data(downstream2_rel_id, self.harness.model.app.name).get(
-                "scrape_jobs"
-            ),
-        )
-        self.assertEqual(
-            json.loads(scrape_jobs),
-            expected_scrape_jobs,
-        )
+                # From upstream charm's app data
+                self.assertEqual(scrape_jobs[0]["metrics_path"], "/metrics")
+
+                # From upstream charm's app data (:9500) and unit data (whatever.cluster.local)
+                self.assertEqual(
+                    scrape_jobs[0]["static_configs"][0]["targets"], ["whatever.cluster.local:9500"]
+                )
 
     def test_change_scrape_interval_multiple_upstreams(self):
         """Ensure multiple upstream jobs are passed on correctly."""
         self.harness.set_leader(True)
-
-        self.harness.update_config({"scrape_interval": "1s"})
 
         upstream_rel_id = self.harness.add_relation("configurable-scrape-jobs", "cassandra-k8s-1")
         self.harness.add_relation_unit(upstream_rel_id, "cassandra-k8s-1/0")
@@ -143,8 +146,12 @@ class TestCharm(unittest.TestCase):
                             "static_configs": [{"targets": ["*:9500"]}],
                         }
                     ]
-                )
+                ),
+                "scrape_metadata": self._scrape_metadata("cassandra-k8s-1"),
             },
+        )
+        self.harness.update_relation_data(
+            upstream_rel_id, "cassandra-k8s-1/0", self._unit_data("cassandra-k8s-1")
         )
 
         upstream_rel_id = self.harness.add_relation("configurable-scrape-jobs", "cassandra-k8s-2")
@@ -160,8 +167,12 @@ class TestCharm(unittest.TestCase):
                             "static_configs": [{"targets": ["*:9600"]}],
                         }
                     ]
-                )
+                ),
+                "scrape_metadata": self._scrape_metadata("cassandra-k8s-2"),
             },
+        )
+        self.harness.update_relation_data(
+            upstream_rel_id, "cassandra-k8s-2/0", self._unit_data("cassandra-k8s-2")
         )
 
         downstream1_rel_id = self.harness.add_relation("metrics-endpoint", "prometheus-k8s-1")
@@ -170,45 +181,31 @@ class TestCharm(unittest.TestCase):
         downstream2_rel_id = self.harness.add_relation("metrics-endpoint", "prometheus-k8s-2")
         self.harness.add_relation_unit(downstream2_rel_id, "prometheus-k8s-2/1")
 
-        # Check that is does not really matter whether we have units
-        # on Prometheus side
-
         self.assertEqual(self.harness.model.unit.status, ActiveStatus())
 
-        expected_scrape_jobs = [
-            {
-                "metrics_path": "/metrics",
-                "scrape_interval": "1s",
-                "static_configs": [{"targets": ["*:9500"]}],
-            },
-            {
-                "metrics_path": "/metrics2",
-                "scrape_interval": "1s",
-                "static_configs": [{"targets": ["*:9600"]}],
-            },
-        ]
+        for rel_id in [downstream1_rel_id, downstream2_rel_id]:
+            with self.subTest(rel_id=rel_id):
+                app_data = self.harness.get_relation_data(
+                    downstream1_rel_id, self.harness.model.app.name
+                )
+                scrape_jobs = typing.cast(str, app_data["scrape_jobs"])
+                scrape_jobs = json.loads(scrape_jobs)
 
-        scrape_jobs = typing.cast(
-            str,
-            self.harness.get_relation_data(downstream1_rel_id, self.harness.model.app.name).get(
-                "scrape_jobs"
-            ),
-        )
-        self.assertEqual(
-            json.loads(scrape_jobs),
-            expected_scrape_jobs,
-        )
+                # From scrape-config's config option
+                self.assertEqual(scrape_jobs[0]["scrape_interval"], "1s")
+                self.assertEqual(scrape_jobs[1]["scrape_interval"], "1s")
 
-        scrape_jobs = typing.cast(
-            str,
-            self.harness.get_relation_data(downstream2_rel_id, self.harness.model.app.name).get(
-                "scrape_jobs"
-            ),
-        )
-        self.assertEqual(
-            json.loads(scrape_jobs),
-            expected_scrape_jobs,
-        )
+                # From upstream charm's app data
+                self.assertEqual(scrape_jobs[0]["metrics_path"], "/metrics")
+                self.assertEqual(scrape_jobs[1]["metrics_path"], "/metrics2")
+
+                # From upstream charm's app data (ports) and unit data (hosts)
+                self.assertEqual(
+                    scrape_jobs[0]["static_configs"][0]["targets"], ["whatever.cluster.local:9500"]
+                )
+                self.assertEqual(
+                    scrape_jobs[1]["static_configs"][0]["targets"], ["whatever.cluster.local:9600"]
+                )
 
     def test_no_downstreams(self):
         """Ensure charm blocks when no downstreams."""
@@ -228,7 +225,7 @@ class TestCharm(unittest.TestCase):
 
         self.assertEqual(
             self.harness.model.unit.status,
-            BlockedStatus("missing metrics consumer"),
+            BlockedStatus("missing metrics consumer (relate to prometheus?)"),
         )
 
     def test_no_upstreams(self):
@@ -240,11 +237,11 @@ class TestCharm(unittest.TestCase):
 
         self.assertEqual(
             self.harness.model.unit.status,
-            BlockedStatus("missing metrics provider"),
+            BlockedStatus("missing metrics provider (relate to upstream charm?)"),
         )
 
     def test_unused_unit_sets_waiting_status_by_default(self):
-        """Ensure that a inactive unit sets waiting status by default."""
+        """Ensure that an inactive unit sets waiting status by default."""
         self.harness.set_leader(False)
 
         self.assertEqual(
@@ -253,7 +250,7 @@ class TestCharm(unittest.TestCase):
         )
 
     def test_unused_unit_sets_waiting_status_on_provider_joined(self):
-        """Ensure that a inactive unit sets waiting status on provider joined ."""
+        """Ensure that an inactive unit sets waiting status on provider joined ."""
         self.harness.set_leader(False)
 
         upstream_rel_id = self.harness.add_relation("configurable-scrape-jobs", "cassandra-k8s")
@@ -265,7 +262,7 @@ class TestCharm(unittest.TestCase):
         )
 
     def test_unused_unit_sets_waiting_status_on_consumer_joined(self):
-        """Ensure that a inactive unit sets waiting status on consumer joined."""
+        """Ensure that an inactive unit sets waiting status on consumer joined."""
         self.harness.set_leader(False)
 
         upstream_rel_id = self.harness.add_relation("metrics-endpoint", "prometheus-k8s")
@@ -308,6 +305,7 @@ class TestCharm(unittest.TestCase):
                 "scrape_jobs": json.dumps(
                     [{"metrics_path": "/metrics", "static_configs": [{"targets": ["*:9500"]}]}]
                 ),
+                "scrape_metadata": self._scrape_metadata("cassandra-k8s"),
                 "alert_rules": json.dumps(alert_rules),
             },
         )
@@ -333,6 +331,15 @@ class TestCharm(unittest.TestCase):
                     [{"metrics_path": "/metrics", "static_configs": [{"targets": ["*:9500"]}]}]
                 ),
                 "alert_rules": json.dumps(alert_rules),
+                "scrape_metadata": json.dumps(
+                    {
+                        "model": "model",
+                        "model_uuid": "f2c1b2a6-e006-11eb-ba80-0242ac130004",
+                        "application": "cassandra-k8s",
+                        "unit": "cassandra/0",
+                        "charm_name": "cassandra-k8s",
+                    }
+                ),
             },
         )
         app_name = self.harness.model.app.name

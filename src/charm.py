@@ -25,10 +25,10 @@ logger = logging.getLogger(__name__)
 
 
 class PrometheusScrapeConfigCharm(CharmBase):
-    """PrometheusScrapeConfigCharm is a adapter charm.
+    """PrometheusScrapeConfigCharm is an adapter charm.
 
-    PrometheusScrapeConfigCharm has no real workload. It
-    transforms incoming scrape jobs from metrics providers i.e scrape
+    PrometheusScrapeConfigCharm has no workload. It
+    transforms incoming scrape jobs from metrics providers i.e. scrape
     targets (e.g., charms that expose a metrics endpoint) and pushes them
     to metrics consumer charms (e.g., a Prometheus charm)
     that will execute the metrics scraping.
@@ -108,7 +108,7 @@ class PrometheusScrapeConfigCharm(CharmBase):
             return
 
         if not self._has_metrics_consumers():
-            self.unit.status = BlockedStatus("missing metrics consumers")
+            self.unit.status = BlockedStatus("missing metrics consumer (relate to prometheus?)")
             return
 
         self._update_all_metrics_consumers(event)
@@ -122,7 +122,9 @@ class PrometheusScrapeConfigCharm(CharmBase):
             return
 
         if not self._has_metrics_providers():
-            self.unit.status = BlockedStatus("missing metrics provider")
+            self.unit.status = BlockedStatus(
+                "missing metrics provider (relate to upstream charm?)"
+            )
             return
 
         self.unit.status = MaintenanceStatus(
@@ -142,7 +144,7 @@ class PrometheusScrapeConfigCharm(CharmBase):
             return
 
         if not self._has_metrics_consumers():
-            self.unit.status = BlockedStatus("missing metrics consumer")
+            self.unit.status = BlockedStatus("missing metrics consumer (relate to prometheus?)")
             return
 
         self.unit.status = MaintenanceStatus(
