@@ -347,3 +347,6 @@ class TestCharm(unittest.TestCase):
             str(self.harness.get_relation_data(prom_rel_id, app_name).get("alert_rules"))
         )
         self.assertDictEqual(prom_rules, alert_rules)
+
+    def test_workload_version_set(self):
+        self.assertEqual(self.harness.get_workload_version(), "n/a")
