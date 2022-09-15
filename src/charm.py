@@ -74,6 +74,12 @@ class PrometheusScrapeConfigCharm(CharmBase):
         self.framework.observe(self.on.config_changed, self._update_all_metrics_consumers)
         # Ensure we refresh scrape jobs on charm upgrade
         self.framework.observe(self.on.upgrade_charm, self._update_all_metrics_consumers)
+        # Initial charm setup
+        self.framework.observe(self.on.install, self._on_install)
+
+    def _on_install(self, _) -> None:
+        """Do any initial charm startup operations."""
+        self.unit.set_workload_version("n/a")
 
     def _has_metrics_providers(self):
         """Are any metrics providers available.
