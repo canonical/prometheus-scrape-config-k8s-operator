@@ -5,7 +5,8 @@
 The Prometheus scrape config operator is an adapter charm that enables you to
 apply a set of configurations to the scrape jobs provided by its upstream
 charms, and forward the modified scrape jobs downstream to one or more
-consumers that will actually perform the scraping.
+consumers that will actually perform the scraping. For a detailed explanation of
+the deployment scenario, see [the integration doc](INTEGRATING.md).
 
 ## Usage
 
