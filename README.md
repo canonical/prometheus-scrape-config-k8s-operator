@@ -23,7 +23,7 @@ through its relation with this charm.
 
 ```sh
 $ juju deploy \
-    prometheus-scrape-configuration-k8s \
+    prometheus-scrape-config-k8s \
     scrape-interval-config \
     --config scrape_interval=20s
 ```
