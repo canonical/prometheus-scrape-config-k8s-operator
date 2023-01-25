@@ -21,7 +21,7 @@ class TestCharm(unittest.TestCase):
         return json.dumps(
             JujuTopology(
                 model="model",
-                model_uuid="f2c1b2a6-e006-11eb-ba80-0242ac130004",
+                model_uuid="20ce8299-3634-4bef-8bd8-5ace6c8816b4",
                 application=app_name,
                 unit="cassandra-k8s/0",
                 charm_name="cassandra-k8s",
@@ -287,7 +287,7 @@ class TestCharm(unittest.TestCase):
                             "alert": "alert",
                             "labels": {
                                 "juju_model": "test_model",
-                                "juju_model_uuid": "test_uuid",
+                                "juju_model_uuid": "20ce8299-3634-4bef-8bd8-5ace6c8816b4",
                                 "juju_application": "test_app",
                                 "juju_charm": "test_charm",
                             },
@@ -334,7 +334,7 @@ class TestCharm(unittest.TestCase):
                 "scrape_metadata": json.dumps(
                     {
                         "model": "model",
-                        "model_uuid": "f2c1b2a6-e006-11eb-ba80-0242ac130004",
+                        "model_uuid": "20ce8299-3634-4bef-8bd8-5ace6c8816b4",
                         "application": "cassandra-k8s",
                         "unit": "cassandra/0",
                         "charm_name": "cassandra-k8s",
