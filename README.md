@@ -1,5 +1,7 @@
 # Prometheus Scrape Config Operator
 
+[![Release to Edge](https://github.com/canonical/prometheus-scrape-config-k8s-operator/actions/workflows/release-edge.yaml/badge.svg)](https://github.com/canonical/prometheus-scrape-config-k8s-operator/actions/workflows/release-edge.yaml)
+
 ## Description
 
 The Prometheus scrape config operator is an adapter charm that enables you to
