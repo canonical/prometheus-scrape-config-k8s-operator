@@ -32,12 +32,25 @@ async def test_deploy_from_local_path(ops_test, charm_under_test):
 async def test_config_values_are_retained_after_pod_deleted_and_restarted(ops_test):
     pod_name = f"{app_name}-0"
 
-    cmd = [
-        "sg",
-        "snap_microk8s",
-        "-c",
-        " ".join(["microk8s.kubectl", "delete", "pod", "-n", ops_test.model_name, pod_name]),
-    ]
+    if os.environ.get("RUNNER_OS"):
+        # Inside a GitHub runner
+        # Find the correct microk8s group name https://github.com/canonical/microk8s/pull/3222
+        try:
+            # Classically confined microk8s
+            uk8s_group = grp.getgrnam("microk8s").gr_name
+        except KeyError:
+            # Strictly confined microk8s
+            uk8s_group = "snap_microk8s" 
+        cmd = [
+                "sg",
+                uk8s_group,
+                "-c",
+                " ".join(["microk8s.kubectl", "delete", "pod", "-n", ops_test.model_name, pod_name]),
+                ]
+    else:
+        # Running locally
+        cmd = ["sudo", "microk8s.kubectl", "delete", "pod", "-n", ops_test.model, pod_name]
+
 
     logger.debug(
         "Removing pod '%s' from model '%s' with cmd: %s", pod_name, ops_test.model_name, cmd
