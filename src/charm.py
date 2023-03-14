@@ -201,7 +201,7 @@ class PrometheusScrapeConfigCharm(CharmBase):
             job.update(config)
             configured_jobs.append(job)
 
-        alerts = list(self._metrics_providers.alerts().values())
+        alerts = list(self._metrics_providers.alerts.values())
         alert_groups = {"groups": []}  # type: ignore
         for entry in alerts:
             alert_groups["groups"] += entry["groups"]
