@@ -3,7 +3,9 @@
 # See LICENSE file for licensing details.
 
 
+import grp
 import logging
+import os
 from pathlib import Path
 
 import pytest
@@ -40,17 +42,16 @@ async def test_config_values_are_retained_after_pod_deleted_and_restarted(ops_te
             uk8s_group = grp.getgrnam("microk8s").gr_name
         except KeyError:
             # Strictly confined microk8s
-            uk8s_group = "snap_microk8s" 
+            uk8s_group = "snap_microk8s"
         cmd = [
-                "sg",
-                uk8s_group,
-                "-c",
-                " ".join(["microk8s.kubectl", "delete", "pod", "-n", ops_test.model_name, pod_name]),
-                ]
+            "sg",
+            uk8s_group,
+            "-c",
+            " ".join(["microk8s.kubectl", "delete", "pod", "-n", ops_test.model_name, pod_name]),
+        ]
     else:
         # Running locally
         cmd = ["sudo", "microk8s.kubectl", "delete", "pod", "-n", ops_test.model, pod_name]
-
 
     logger.debug(
         "Removing pod '%s' from model '%s' with cmd: %s", pod_name, ops_test.model_name, cmd
