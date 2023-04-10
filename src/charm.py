@@ -72,8 +72,14 @@ class PrometheusScrapeConfigCharm(CharmBase):
 
         # manages configuration changes for this charm
         self.framework.observe(self.on.config_changed, self._update_all_metrics_consumers)
+        
         # Ensure we refresh scrape jobs on charm upgrade
         self.framework.observe(self.on.upgrade_charm, self._update_all_metrics_consumers)
+        
+        # Sometimes a `stop` event is followed by a `start` event with nothing in between
+        # https://bugs.launchpad.net/juju/+bug/2015566
+        self.framework.observe(self.on.start, self._update_all_metrics_consumers)
+        
         # Initial charm setup
         self.framework.observe(self.on.install, self._on_install)
 
