@@ -90,7 +90,7 @@ class PrometheusScrapeConfigCharm(CharmBase):
     def _has_metrics_providers(self):
         """Are any metrics providers available.
 
-        Returns
+        Returns:
         -------
             True if at least one metrics provider is related to this charm,
             False otherwise.
@@ -103,7 +103,7 @@ class PrometheusScrapeConfigCharm(CharmBase):
     def _has_metrics_consumers(self):
         """Are any metrics consumers available.
 
-        Returns
+        Returns:
         -------
             True if at least one metrics consumer is related to this charm,
             False otherwise.
@@ -196,7 +196,7 @@ class PrometheusScrapeConfigCharm(CharmBase):
         charm. The scrape jobs (including associated alert rules)
         are returned.
 
-        Returns
+        Returns:
         -------
             A dictionary with keys "scrape_jobs" and "alert_rules".
         """
