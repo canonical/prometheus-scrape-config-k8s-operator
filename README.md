@@ -1,4 +1,4 @@
- # Prometheus Scrape Config Operator
+# Prometheus Scrape Config Operator
 
 [![CharmHub Badge](https://charmhub.io/prometheus-scrape-config-k8s/badge.svg)](https://charmhub.io/prometheus-scrape-config-k8s)
 [![Release](https://github.com/canonical/prometheus-scrape-config-k8s-operator/actions/workflows/release.yaml/badge.svg)](https://github.com/canonical/prometheus-scrape-config-k8s-operator/actions/workflows/release.yaml)
