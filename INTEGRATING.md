@@ -3,24 +3,28 @@
 ```mermaid
 graph LR
 
-subgraph providers["Providers (upstream)"]
-  cassandra[Cassandra]
-  avalanche[Avalanche]
+subgraph LXD model 1
+nrpe --- cos-proxy --- sc1[scrape-config]
 end
 
-cassandra --->|scrape job| scrape-config
-avalanche --->|scrape job| scrape-config
+sc1 --- prometheus
 
-subgraph consumers["Consumers (downstream)"]
-  prometheus[Prometheus]
-  mimir[Mimir]
+subgraph LXD model 2
+zookeeper --- grafana-agent --- sc2[scrape-config]
 end
 
-scrape-config --->|modified scrape job| prometheus
-scrape-config --->|modified scrape job| mimir
+sc2 --- prometheus
 
-config{juju config} -->|e.g. scrape_interval| scrape-config
+subgraph K8s model
+prometheus
+end
+
+
+style sc1 stroke-width:4px
+style sc2 stroke-width:4px
 ```
+
+## `scrape_configs` manipulation
 
 Generally, the prometheus config file ([example][prom-config-example])
 has the following form:
