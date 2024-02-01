@@ -10,7 +10,7 @@ from helpers import get_prometheus_rules
 
 logger = logging.getLogger(__name__)
 
-APP_NAME = "cos-config"
+APP_NAME = "prometheus-scrape-config"
 PROM_NAME = "prometheus"
 ZINC_NAME = "zinc"
 

@@ -25,127 +25,43 @@ logger = logging.getLogger(__name__)
 
 
 class PrometheusScrapeConfigCharm(CharmBase):
-    """PrometheusScrapeConfigCharm is an adapter charm.
-
-    PrometheusScrapeConfigCharm has no workload. It
-    transforms incoming scrape jobs from metrics providers i.e. scrape
-    targets (e.g., charms that expose a metrics endpoint) and pushes them
-    to metrics consumer charms (e.g., a Prometheus charm)
-    that will execute the metrics scraping.
-    """
+    """PrometheusScrapeConfigCharm is an adapter charm used to override configuration settings in a scrape job."""
 
     def __init__(self, *args):
         """Construct the charm."""
         super().__init__(*args)
 
-        # Scrape jobs are obtained over this relation
         self._metrics_provider_relation_name = "configurable-scrape-jobs"
-        # Scrape jobs are forwarded to a "metrics consumer" such as Prometheus over this relation
         self._metrics_consumer_relation_name = "metrics-endpoint"
 
-        # Use a metrics consumer object to manage relations with all metrics provider charms
-        # related to this charm. Note the metrics consumer object in this charm also acts
-        # as the metrics provider for other metrics consumer charms related with this charm,
-        # hence we label the metrics consumer object in this charm as the `_metrics_providers`.
+        # The metrics consumer object in this charm also acts as the metrics provider for other metrics
+        # consumer charms related with this charm, hence we label the metrics consumer object in this charm
+        # as the `_metrics_providers`.
         self._metrics_providers = MetricsEndpointConsumer(
             self, self._metrics_provider_relation_name
         )
 
-        # when list of metrics providers change notify all metrics consumers
-        self.framework.observe(
+        consumer_events = self.on[self._metrics_consumer_relation_name]
+        provider_events = self.on[self._metrics_provider_relation_name]
+
+        for e in [
+            self.on.start,
+            self.on.config_changed,
+            self.on.upgrade_charm,
             self._metrics_providers.on.targets_changed,
-            self._update_all_metrics_consumers,
-        )
+            provider_events.relation_created,
+            provider_events.relation_joined,
+            provider_events.relation_broken,
+            consumer_events.relation_created,
+            consumer_events.relation_changed,
+        ]:
+            self.framework.observe(e, self._update_all_metrics_consumers)
 
-        # when a metrics provider goes away updated all metrics consumers
-        self.framework.observe(
-            self.on[self._metrics_provider_relation_name].relation_broken,
-            self._on_metrics_provider_relation_broken,
-        )
-
-        # When a new consumer of the metrics-endpoint relation is related,
-        # pass it all the current scrape jobs.
-        self.framework.observe(
-            self.on[self._metrics_consumer_relation_name].relation_created,
-            self._update_new_metrics_consumer,
-        )
-
-        # manages configuration changes for this charm
-        self.framework.observe(self.on.config_changed, self._update_all_metrics_consumers)
-
-        # Ensure we refresh scrape jobs on charm upgrade
-        self.framework.observe(self.on.upgrade_charm, self._update_all_metrics_consumers)
-
-        # Sometimes a `stop` event is followed by a `start` event with nothing in between
-        # https://bugs.launchpad.net/juju/+bug/2015566
-        self.framework.observe(self.on.start, self._update_all_metrics_consumers)
-
-        # Initial charm setup
         self.framework.observe(self.on.install, self._on_install)
 
     def _on_install(self, _) -> None:
         """Do any initial charm startup operations."""
         self.unit.set_workload_version("n/a")
-
-    def _has_metrics_providers(self):
-        """Are any metrics providers available.
-
-        Returns:
-        -------
-            True if at least one metrics provider is related to this charm,
-            False otherwise.
-        """
-        return (
-            self._metrics_provider_relation_name in self.model.relations
-            and self.model.relations[self._metrics_provider_relation_name]
-        )
-
-    def _has_metrics_consumers(self):
-        """Are any metrics consumers available.
-
-        Returns:
-        -------
-            True if at least one metrics consumer is related to this charm,
-            False otherwise.
-        """
-        return (
-            self._metrics_consumer_relation_name in self.model.relations
-            and self.model.relations[self._metrics_consumer_relation_name]
-        )
-
-    def _on_metrics_provider_relation_broken(self, event):
-        """Block the charm when no charms contribute scrape jobs."""
-        if not self.unit.is_leader():
-            self.unit.status = WaitingStatus("inactive unit")
-            return
-
-        if not self._has_metrics_consumers():
-            self.unit.status = BlockedStatus("missing metrics consumer (relate to prometheus?)")
-            return
-
-        self._update_all_metrics_consumers(event)
-
-    def _update_new_metrics_consumer(self, event):
-        """Set Prometheus scrape configuration for all targets."""
-        logger.debug("Updating new metrics consumer")
-
-        if not self.unit.is_leader():
-            self.unit.status = WaitingStatus("inactive unit")
-            return
-
-        if not self._has_metrics_providers():
-            self.unit.status = BlockedStatus(
-                "missing metrics provider (relate to upstream charm?)"
-            )
-            return
-
-        self.unit.status = MaintenanceStatus(
-            "Forwarding scrape jobs and alert rules for new metrics consumers"
-        )
-
-        self._update_metrics_consumer_relation(event.relation)
-
-        self.unit.status = ActiveStatus()
 
     def _update_all_metrics_consumers(self, _):
         """Update all scrape configuration jobs for all metrics consumers."""
@@ -155,8 +71,14 @@ class PrometheusScrapeConfigCharm(CharmBase):
             self.unit.status = WaitingStatus("inactive unit")
             return
 
-        if not self._has_metrics_consumers():
+        if not self._has_consumers():
             self.unit.status = BlockedStatus("missing metrics consumer (relate to prometheus?)")
+            return
+
+        if not self._has_providers():
+            self.unit.status = BlockedStatus(
+                "missing metrics provider (relate to upstream charm?)"
+            )
             return
 
         self.unit.status = MaintenanceStatus(
@@ -195,10 +117,6 @@ class PrometheusScrapeConfigCharm(CharmBase):
         metrics consumers, using configuration items set in this
         charm. The scrape jobs (including associated alert rules)
         are returned.
-
-        Returns:
-        -------
-            A dictionary with keys "scrape_jobs" and "alert_rules".
         """
         config = self.model.config.items()
 
@@ -216,6 +134,20 @@ class PrometheusScrapeConfigCharm(CharmBase):
             "scrape_jobs": configured_jobs,
             "alert_rules": alert_groups if alert_groups["groups"] else {},
         }
+
+    def _has_providers(self):
+        """Checks if there is at least one metrics provider related to the charm."""
+        return (
+            self._metrics_provider_relation_name in self.model.relations
+            and self.model.relations[self._metrics_provider_relation_name]
+        )
+
+    def _has_consumers(self):
+        """Checks if there is at least one metrics consumer related to the charm."""
+        return (
+            self._metrics_consumer_relation_name in self.model.relations
+            and self.model.relations[self._metrics_consumer_relation_name]
+        )
 
 
 if __name__ == "__main__":
