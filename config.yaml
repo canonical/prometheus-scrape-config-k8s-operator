@@ -16,7 +16,7 @@ options:
   relabel_configs:
     description: YAML string formatted scrape target relabeling configuration.
     type: string
-  metrics_relabel_configs:
+  metric_relabel_configs:
     description: YAML string formatted metrics relabeling configuration.
     type: string
   sample_limit:
