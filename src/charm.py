@@ -16,6 +16,7 @@ through the 'metrics-endpoint' relation using the
 import json
 import logging
 
+import yaml
 from charms.prometheus_k8s.v0.prometheus_scrape import MetricsEndpointConsumer
 from ops.charm import CharmBase
 from ops.main import main
@@ -118,7 +119,11 @@ class PrometheusScrapeConfigCharm(CharmBase):
         charm. The scrape jobs (including associated alert rules)
         are returned.
         """
-        config = self.model.config.items()
+        yaml_keys = ["relabel_configs", "metric_relabel_configs"]
+        config = {k: v for k, v in self.model.config.items() if k not in yaml_keys}
+        for key in yaml_keys:
+            if as_yaml := self.model.config.get(key):
+                config[key] = yaml.safe_load(as_yaml)
 
         configured_jobs = []
         for job in self._metrics_providers.jobs():
