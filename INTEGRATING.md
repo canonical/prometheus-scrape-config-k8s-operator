@@ -3,25 +3,32 @@
 ```mermaid
 graph LR
 
-subgraph LXD model 1
+subgraph LXD model
 nrpe --- cos-proxy --- sc1[scrape-config]
+st1[scrape-target] --- sc1[scrape-config]
+
 end
 
 sc1 --- prometheus
 
-subgraph LXD model 2
-zookeeper --- grafana-agent --- sc2[scrape-config]
-end
-
-sc2 --- prometheus
 
 subgraph K8s model
+postgresql --- sc3[scrape-config]
+st2[scrape-target] --- sc4[scrape-config]
+sc3 --- ga2[grafana-agent]
+sc4 --- ga2
+end
+
+ga2 --- prometheus
+
+subgraph O11y k8s model
 prometheus
 end
 
 
 style sc1 stroke-width:4px
-style sc2 stroke-width:4px
+style sc3 stroke-width:4px
+style sc4 stroke-width:4px
 ```
 
 ## `scrape_configs` manipulation
