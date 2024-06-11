@@ -24,29 +24,6 @@ style sc1 stroke-width:4px
 style sc2 stroke-width:4px
 ```
 
-Both scrape-config and scrape-target are workloadless charms, so they can be
-deployed in VM models. Note that cross-model scrape is discouraged, and that
-you may need to take special care to have the scrape target reachable by
-prometheus.
-
-```mermaid
-graph LR
-
-subgraph LXD model
-nrpe --- cos-proxy --- sc[scrape-config]
-st[scrape-target] --- sc[scrape-config]
-
-end
-
-sc --- prometheus
-
-subgraph O11y k8s model
-prometheus
-end
-
-style sc stroke-width:4px
-```
-
 Another option is to deploy scrape-config inside the Observability model
 itself. This is usually not recommended for production deployments.
 
@@ -60,6 +37,9 @@ end
 style scrape-config stroke-width:4px
 ```
 
+Note that while both scrape-config and scrape-target are workloadless charms
+and can be deployed in VM models, this mode of operation (cross-model scrape)
+is discouraged.
 
 ## `scrape_configs` manipulation
 
