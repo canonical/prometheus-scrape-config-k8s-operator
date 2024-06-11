@@ -1,28 +1,45 @@
 ## Deployment scenarios
+The `scrape-config` charm can be used for example to set different scrape
+intervals for different jobs. The adjusted scrape job can then be forwarded to
+grafana agent:
 
 ```mermaid
 graph LR
 
-subgraph LXD model 1
-nrpe --- cos-proxy --- sc1[scrape-config]
-end
-
-sc1 --- prometheus
-
-subgraph LXD model 2
-zookeeper --- grafana-agent --- sc2[scrape-config]
-end
-
-sc2 --- prometheus
-
 subgraph K8s model
+postgresql --- sc1[scrape-config]
+sc1 --- ga[grafana-agent]
+
+st[scrape-target] --- sc2[scrape-config]
+sc2 --- ga
+end
+
+ga --- prometheus
+
+subgraph O11y k8s model
 prometheus
 end
-
 
 style sc1 stroke-width:4px
 style sc2 stroke-width:4px
 ```
+
+Another option is to deploy scrape-config inside the Observability model
+itself. This is usually not recommended for production deployments.
+
+```mermaid
+graph
+
+subgraph O11y k8s model
+scrape-target --- scrape-config --- prometheus
+end
+
+style scrape-config stroke-width:4px
+```
+
+Note that while both scrape-config and scrape-target are workloadless charms
+and can be deployed in VM models, this mode of operation (cross-model scrape)
+is discouraged.
 
 ## `scrape_configs` manipulation
 
