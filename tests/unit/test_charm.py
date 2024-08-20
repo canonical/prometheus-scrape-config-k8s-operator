@@ -7,10 +7,11 @@ import json
 import typing
 import unittest
 
-from charm import PrometheusScrapeConfigCharm
 from charms.observability_libs.v0.juju_topology import JujuTopology
 from ops.model import ActiveStatus, BlockedStatus, WaitingStatus
 from ops.testing import Harness
+
+from charm import PrometheusScrapeConfigCharm
 
 
 class TestCharm(unittest.TestCase):
