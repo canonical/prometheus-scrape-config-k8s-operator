@@ -14,11 +14,11 @@ the deployment scenario, see [the integration doc](INTEGRATING.md).
 
 ## Usage
 
-First, deploy the prometheus and the cassandra charms.
+First, deploy the prometheus and the charm you want to be monitored with a modified configuration.
 
 ```sh
-$ juju deploy prometheus-k8s
-$ juju deploy cassandra-k8s
+$ juju deploy prometheus-k8s prometheus
+$ juju deploy your-charm
 ```
 
 Then, deploy the `prometheus-scrape-configuration` charm, specifying a 
@@ -35,8 +35,35 @@ $ juju deploy \
 Relate the charms together.
 
 ```sh
-$ juju relate cassandra-k8s scrape-interval-config
-$ juju relate scrape-interval-config prometheus-k8s
+$ juju relate your-charm scrape-interval-config
+$ juju relate scrape-interval-config:metrics-endpoint prometheus
+```
+
+### `blocked` state
+
+If you relate `prometheus-scrape-config-k8s` only to `prometheus`,
+the charm will be in `blocked` state until any other charm relates to it.
+This is expected and doesn't mean the environment is in a wrong state.
+
+```
+Unit                             Workload  Agent      Address       Ports          Message
+prometheus-scrape-config-k8s/0*  blocked   idle                                    missing metrics provider (relate to upstream charm?)
+prometheus/0*                    active    idle
+your-charm/0*                    active    idle
+```
+
+After a `prometheus_scrape` relation is added, the charm will go
+into `active` state.
+
+```
+$ juju relate your-charm:metrics-endpoint prometheus-scrape-config-k8s:configurable-scrape-jobs
+$ juju status
+(...)
+
+Unit                             Workload  Agent  Address       Ports          Message
+prometheus-scrape-config-k8s/0*  active    idle
+prometheus/0*                    active    idle
+your-charm/0*                    active    idle
 ```
 
 ## Relations
