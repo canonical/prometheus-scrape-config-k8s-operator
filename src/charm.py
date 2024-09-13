@@ -123,7 +123,7 @@ class PrometheusScrapeConfigCharm(CharmBase):
         config = {k: v for k, v in self.model.config.items() if k not in yaml_keys}
         for key in yaml_keys:
             if as_yaml := self.model.config.get(key):
-                config[key] = yaml.safe_load(as_yaml)
+                config[key] = yaml.safe_load(str(as_yaml))
 
         configured_jobs = []
         for job in self._metrics_providers.jobs():
