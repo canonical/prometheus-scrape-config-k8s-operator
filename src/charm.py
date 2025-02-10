@@ -15,6 +15,7 @@ through the 'metrics-endpoint' relation using the
 
 import json
 import logging
+from typing import cast
 
 import yaml
 from charms.prometheus_k8s.v0.prometheus_scrape import MetricsEndpointConsumer
@@ -34,7 +35,7 @@ class PrometheusScrapeConfigCharm(CharmBase):
 
         self._metrics_provider_relation_name = "configurable-scrape-jobs"
         self._metrics_consumer_relation_name = "metrics-endpoint"
-        self._forward_alert_rules = self.config["forward_alert_rules"]
+        self._forward_alert_rules = cast(bool, self.config["forward_alert_rules"])
 
         # The metrics consumer object in this charm also acts as the metrics provider for other metrics
         # consumer charms related with this charm, hence we label the metrics consumer object in this charm

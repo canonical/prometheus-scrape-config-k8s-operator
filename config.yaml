@@ -33,5 +33,5 @@ options:
     type: int
   forward_alert_rules:
     description: Toggle forwarding of alert rules.
-    type: bool
+    type: boolean
     default: true
