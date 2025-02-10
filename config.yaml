@@ -31,3 +31,7 @@ options:
   label_value_length_limit:
     description: Maximum length of label value (0=unlimited)
     type: int
+  forward_alert_rules:
+    description: Toggle forwarding of alert rules.
+    type: bool
+    default: true

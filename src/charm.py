@@ -34,6 +34,7 @@ class PrometheusScrapeConfigCharm(CharmBase):
 
         self._metrics_provider_relation_name = "configurable-scrape-jobs"
         self._metrics_consumer_relation_name = "metrics-endpoint"
+        self._forward_alert_rules = self.config["forward_alert_rules"]
 
         # The metrics consumer object in this charm also acts as the metrics provider for other metrics
         # consumer charms related with this charm, hence we label the metrics consumer object in this charm
@@ -132,8 +133,9 @@ class PrometheusScrapeConfigCharm(CharmBase):
 
         alerts = list(self._metrics_providers.alerts.values())
         alert_groups = {"groups": []}  # type: ignore
-        for entry in alerts:
-            alert_groups["groups"] += entry["groups"]
+        if self._forward_alert_rules:
+            for entry in alerts:
+                alert_groups["groups"] += entry["groups"]
 
         return {
             "scrape_jobs": configured_jobs,
