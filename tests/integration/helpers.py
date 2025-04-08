@@ -2,7 +2,7 @@
 # Copyright 2021 Canonical Ltd.
 # See LICENSE file for licensing details.
 
-from typing import List, Literal
+from typing import List, Literal, Optional
 
 import aiohttp
 from pytest_operator.plugin import OpsTest
@@ -43,7 +43,7 @@ class Prometheus:
                 result = await response.json()
                 return result["data"]["yaml"] if result["status"] == "success" else ""
 
-    async def rules(self, rules_type: Literal["alert", "record"] = None) -> list:
+    async def rules(self, rules_type: Optional[Literal["alert", "record"]] = None) -> list:
         """Send a GET request to get Prometheus rules.
 
         Args:
@@ -139,6 +139,7 @@ async def unit_address(ops_test: OpsTest, app_name: str, unit_num: int) -> str:
     Returns:
         unit address as a string
     """
+    assert ops_test.model
     status = await ops_test.model.get_status()
     return status["applications"][app_name]["units"][f"{app_name}/{unit_num}"]["address"]
 
