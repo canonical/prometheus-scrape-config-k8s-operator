@@ -8,6 +8,7 @@ requires-python = "~=3.8"
 dependencies = [
   "ops",
   "pydantic-core",
+  "cosl",
 ]
 
 [project.optional-dependencies]
@@ -21,7 +22,6 @@ dev = [
   "pytest",
   "coverage[toml]",
   "responses",
-  "cosl",
   # Integration
   "juju",
   "pytest-operator",
