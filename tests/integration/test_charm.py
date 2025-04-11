@@ -46,21 +46,31 @@ async def test_relate(ops_test):
 
 
 async def test_alert_rules_exist(ops_test):
-    rules = await get_prometheus_rules(ops_test=ops_test, app_name=PROM_NAME, unit_num=0)
+    rules = await get_prometheus_rules(
+        ops_test=ops_test, app_name=PROM_NAME, unit_num=0
+    )
     assert len(rules) > 0, "No alert rules are present even though zinc is related"
 
 
 async def test_multiple_workloads_alert_rules(ops_test):
-    old_rules = await get_prometheus_rules(ops_test=ops_test, app_name=PROM_NAME, unit_num=0)
+    old_rules = await get_prometheus_rules(
+        ops_test=ops_test, app_name=PROM_NAME, unit_num=0
+    )
     await ops_test.model.add_relation(APP_NAME, "zinc2")
     await ops_test.model.wait_for_idle(status="active")
-    new_rules = await get_prometheus_rules(ops_test=ops_test, app_name=PROM_NAME, unit_num=0)
-    assert len(new_rules) > len(old_rules), "Additional workload instance did not add alert rules"
+    new_rules = await get_prometheus_rules(
+        ops_test=ops_test, app_name=PROM_NAME, unit_num=0
+    )
+    assert len(new_rules) > len(
+        old_rules
+    ), "Additional workload instance did not add alert rules"
 
 
 async def test_non_leader_units_set_waiting_status(ops_test):
     await ops_test.model.applications[APP_NAME].scale(scale=2)
-    await ops_test.model.block_until(lambda: len(ops_test.model.applications[APP_NAME].units) == 2)
+    await ops_test.model.block_until(
+        lambda: len(ops_test.model.applications[APP_NAME].units) == 2
+    )
     await ops_test.model.wait_for_idle()
     statuses = []
     for unit in ops_test.model.applications[APP_NAME].units:

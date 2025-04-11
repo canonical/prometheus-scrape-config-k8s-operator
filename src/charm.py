@@ -75,7 +75,9 @@ class PrometheusScrapeConfigCharm(CharmBase):
             return
 
         if not self._has_consumers():
-            self.unit.status = BlockedStatus("missing metrics consumer (relate to prometheus?)")
+            self.unit.status = BlockedStatus(
+                "missing metrics consumer (relate to prometheus?)"
+            )
             return
 
         if not self._has_providers():

@@ -12,15 +12,19 @@ from helpers import get_config_values
 
 logger = logging.getLogger(__name__)
 
-METADATA = yaml.safe_load(Path("./metadata.yaml").read_text())
+METADATA = yaml.safe_load(Path("./charmcraft.yaml").read_text())
 app_name = METADATA["name"]
 
 
 @pytest.mark.abort_on_fail
-async def test_config_values_are_retained_after_pod_upgraded(ops_test, charm_under_test):
+async def test_config_values_are_retained_after_pod_upgraded(
+    ops_test, charm_under_test
+):
     """Deploy from charmhub and then upgrade with the charm-under-test."""
     logger.info("deploy charm from charmhub")
-    await ops_test.model.deploy(f"ch:{app_name}", application_name=app_name, channel="edge")
+    await ops_test.model.deploy(
+        f"ch:{app_name}", application_name=app_name, channel="edge"
+    )
 
     # set some custom configs to later check they persisted across the test
     config = {"scrape_interval": "15s", "scrape_timeout": "10s"}
