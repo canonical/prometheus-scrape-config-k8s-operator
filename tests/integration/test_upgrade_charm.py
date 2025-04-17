@@ -9,6 +9,7 @@ from pathlib import Path
 import pytest
 import yaml
 from helpers import get_config_values
+from pytest_operator.plugin import OpsTest
 
 logger = logging.getLogger(__name__)
 
@@ -17,13 +18,15 @@ app_name = METADATA["name"]
 
 
 @pytest.mark.abort_on_fail
-async def test_config_values_are_retained_after_pod_upgraded(
-    ops_test, charm_under_test
-):
+async def test_config_values_are_retained_after_pod_upgraded(ops_test: OpsTest, charm_under_test):
     """Deploy from charmhub and then upgrade with the charm-under-test."""
+    assert ops_test.model
     logger.info("deploy charm from charmhub")
     await ops_test.model.deploy(
-        f"ch:{app_name}", application_name=app_name, channel="edge"
+        f"ch:{app_name}",
+        application_name=app_name,
+        channel="edge",
+        base="20.04",
     )
 
     # set some custom configs to later check they persisted across the test
