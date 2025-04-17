@@ -26,7 +26,7 @@ async def test_config_values_are_retained_after_pod_upgraded(ops_test: OpsTest, 
         f"ch:{app_name}",
         application_name=app_name,
         channel="edge",
-        base="20.04",
+        base="ubuntu@20.04",
     )
 
     # set some custom configs to later check they persisted across the test
