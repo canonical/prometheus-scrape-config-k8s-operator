@@ -123,8 +123,9 @@ class PrometheusScrapeConfigCharm(CharmBase):
         charm. The scrape jobs (including associated alert rules)
         are returned.
         """
+        non_scrape_config_keys = ["forward_alert_rules"]
         yaml_keys = ["relabel_configs", "metric_relabel_configs"]
-        config = {k: v for k, v in self.model.config.items() if k not in yaml_keys}
+        config = {k: v for k, v in self.model.config.items() if k not in [*non_scrape_config_keys, *yaml_keys]}
         for key in yaml_keys:
             if as_yaml := self.model.config.get(key):
                 config[key] = yaml.safe_load(str(as_yaml))

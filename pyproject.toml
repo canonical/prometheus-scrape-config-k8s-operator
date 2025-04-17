@@ -26,6 +26,7 @@ dev = [
   "juju",
   "pytest-operator",
   "aiohttp",
+  "sh",
 ]
 
 # Testing tools configuration
