@@ -23,7 +23,7 @@ async def test_config_values_are_retained_after_pod_upgraded(ops_test: OpsTest, 
     """Deploy from charmhub and then upgrade with the charm-under-test."""
     assert ops_test.model
     logger.info("deploy charm from charmhub")
-    sh.juju.deploy(app_name, model=ops_test.model.name, channel="edge", base="ubuntu@20.04")
+    sh.juju.deploy(app_name, model=ops_test.model.name, channel="edge", base="ubuntu@24.04")
 
     # set some custom configs to later check they persisted across the test
     config = {"scrape_interval": "15s", "scrape_timeout": "10s"}
