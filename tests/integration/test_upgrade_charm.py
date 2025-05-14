@@ -33,7 +33,7 @@ async def test_config_values_are_retained_after_pod_upgraded(ops_test: OpsTest, 
     await ops_test.model.wait_for_idle(apps=[app_name], status="blocked", timeout=1000)
 
     logger.info("upgrade deployed charm with local charm %s", charm_under_test)
-    sh.juju.refresh(app_name, model=ops_test.model.name, path=charm_under_test, channel="2/edge")
+    sh.juju.refresh(app_name, model=ops_test.model.name, path=charm_under_test)
     await ops_test.model.wait_for_idle(apps=[app_name], status="blocked", timeout=1000)
 
     assert (await get_config_values(ops_test, app_name)).items() >= config.items()
