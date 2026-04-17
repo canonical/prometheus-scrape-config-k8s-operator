@@ -4,12 +4,24 @@ name: prometheus-scrape-config-k8s
 type: charm
 summary: A set of Prometheus scrape configuration options.
 description: |
-  This charm provides a reusable unit of Prometheus
-  scrape job configuration options. By interposing
-  this charm between a scraped target and the Prometheus
-  charm, configurations in scrape jobs submitted by the
-  target can be overridden by the Juju configuration
-  options set for this charm.
+  Prometheus Scrape Config K8s is a workloadless Juju charm that acts as an adapter between
+  metrics providers and Prometheus on Kubernetes. It intercepts scrape jobs from upstream charms
+  and allows operators to override configuration options — such as scrape interval, timeout,
+  relabeling rules, and sample limits — before forwarding them to Prometheus. It is a
+  complementary charm to the Canonical Observability Stack (COS):
+  https://documentation.ubuntu.com/observability
+
+  By interposing this charm between a scrape target and Prometheus, operators gain centralized
+  control over scrape job settings without modifying the target charms themselves.
+
+  Key features:
+
+  - Override scrape job configurations (interval, timeout, proxy, relabeling) provided by
+    upstream charms before they reach Prometheus.
+  - Configurable sample and label limits to control ingestion volume.
+  - Support for metric relabeling to filter, rename, or drop metrics at scrape time.
+  - Toggle forwarding of alert rules from upstream charms.
+  - Workloadless charm — no additional containers or resources required.
 
 links:
   documentation: https://discourse.charmhub.io/t/prometheus-scrape-config-k8s-docs-index/6856
