@@ -24,7 +24,7 @@ description: |
   - Workloadless charm — no additional containers or resources required.
 
 links:
-  documentation: https://discourse.charmhub.io/t/prometheus-scrape-config-k8s-docs-index/6856
+  documentation: https://documentation.ubuntu.com/observability/latest/
   website: https://charmhub.io/prometheus-scrape-config-k8s
   source: https://github.com/canonical/prometheus-scrape-config-k8s-operator
   issues: https://github.com/canonical/prometheus-scrape-config-k8s-operator/issues
