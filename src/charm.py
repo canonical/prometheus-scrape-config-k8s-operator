@@ -17,6 +17,7 @@ import json
 import logging
 from typing import cast
 
+import ops_tracing
 import yaml
 from charms.prometheus_k8s.v0.prometheus_scrape import MetricsEndpointConsumer
 from ops.charm import CharmBase
@@ -42,6 +43,13 @@ class PrometheusScrapeConfigCharm(CharmBase):
         # as the `_metrics_providers`.
         self._metrics_providers = MetricsEndpointConsumer(
             self, self._metrics_provider_relation_name
+        )
+
+        # Emit charm hook traces to a tracing backend (e.g. Tempo); both relations are optional.
+        self.charm_tracing = ops_tracing.Tracing(
+            self,
+            tracing_relation_name="charm-tracing",
+            ca_relation_name="receive-ca-cert",
         )
 
         consumer_events = self.on[self._metrics_consumer_relation_name]
