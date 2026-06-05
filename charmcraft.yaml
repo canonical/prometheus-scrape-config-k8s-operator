@@ -49,6 +49,18 @@ provides:
 requires:
   configurable-scrape-jobs:
     interface: prometheus_scrape
+  charm-tracing:
+    interface: tracing
+    limit: 1
+    optional: true
+    description: |
+      Enables sending charm hook traces to a distributed tracing backend such as Tempo.
+  receive-ca-cert:
+    interface: certificate_transfer
+    limit: 1
+    optional: true
+    description: |
+      Receives a CA certificate used to validate TLS connections to the charm tracing backend.
 
 config:
   options:

@@ -6,7 +6,7 @@ version = "0.0"
 requires-python = "~=3.8"
 
 dependencies = [
-  "ops",
+  "ops[tracing]",
   "pydantic-core",
   "cosl",
 ]
@@ -20,13 +20,19 @@ dev = [
   "pyright",
   # Unit
   "pytest",
+  "ops[testing]",  # ops-scenario, for the charm-tracing state-transition tests
   "coverage[toml]",
   "responses",
-  # Integration
+  # Integration (pytest-operator suite)
   "juju",
   "pytest-operator",
   "aiohttp!=3.11.13",  # Yanked
   "sh",
+  # Integration (jubilant suite — charm tracing)
+  "jubilant",
+  "pytest-jubilant",
+  "requests",
+  "tenacity",
 ]
 
 # Testing tools configuration
