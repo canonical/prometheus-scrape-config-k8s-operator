@@ -24,19 +24,30 @@ def test_dependencies(juju: Juju):
     juju.deploy("prometheus-k8s", app=PROM_NAME, channel="dev/edge", trust=True)
     juju.deploy("zinc-k8s", app=ZINC_NAME, channel="edge")
     juju.deploy("zinc-k8s", app="zinc2", channel="edge")
-    juju.wait(jubilant.all_active, timeout=1000)
+    juju.wait(
+        lambda status: jubilant.all_active(status) and jubilant.all_agents_idle(status),
+        timeout=1000,
+    )
 
 
 def test_build_and_deploy(juju: Juju, charm: pathlib.Path):
     juju.deploy(charm, app=APP_NAME)
     # The charm should be in blocked state if not related to anything.
-    juju.wait(lambda status: jubilant.all_blocked(status, APP_NAME), timeout=1000)
+    juju.wait(
+        lambda status: (
+            jubilant.all_blocked(status, APP_NAME) and jubilant.all_agents_idle(status, APP_NAME)
+        ),
+        timeout=1000,
+    )
 
 
 def test_relate(juju: Juju):
     juju.integrate(f"{PROM_NAME}:metrics-endpoint", f"{APP_NAME}:metrics-endpoint")
     juju.integrate(f"{APP_NAME}:configurable-scrape-jobs", f"{ZINC_NAME}:metrics-endpoint")
-    juju.wait(jubilant.all_active, timeout=1000)
+    juju.wait(
+        lambda status: jubilant.all_active(status) and jubilant.all_agents_idle(status),
+        timeout=1000,
+    )
 
 
 def test_alert_rules_exist(juju: Juju):
@@ -47,7 +58,10 @@ def test_alert_rules_exist(juju: Juju):
 def test_multiple_workloads_alert_rules(juju: Juju):
     old_rules = get_prometheus_rules(juju=juju, app_name=PROM_NAME, unit_num=0)
     juju.integrate(APP_NAME, "zinc2")
-    juju.wait(jubilant.all_active, timeout=1000)
+    juju.wait(
+        lambda status: jubilant.all_active(status) and jubilant.all_agents_idle(status),
+        timeout=1000,
+    )
     new_rules = get_prometheus_rules(juju=juju, app_name=PROM_NAME, unit_num=0)
     assert len(new_rules) > len(old_rules), "Additional workload instance did not add alert rules"
 
