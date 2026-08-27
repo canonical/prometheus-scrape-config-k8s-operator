@@ -4,8 +4,7 @@
 """End-to-end test that the charm's hook spans reach Tempo over `charm-tracing`.
 
 Deploys the charm with a monolithic Tempo cluster, relates `charm-tracing`, and checks
-the charm's spans show up in Tempo. Uses jubilant (the `juju` fixture comes from
-pytest-jubilant).
+the charm's spans show up in Tempo.
 """
 
 from __future__ import annotations

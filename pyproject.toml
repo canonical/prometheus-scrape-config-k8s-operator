@@ -23,14 +23,10 @@ dev = [
   "ops[testing]",  # ops-scenario, for the charm-tracing state-transition tests
   "coverage[toml]",
   "responses",
-  # Integration (pytest-operator suite)
-  "juju",
-  "pytest-operator",
-  "aiohttp!=3.11.13",  # Yanked
-  "sh",
-  # Integration (jubilant suite — charm tracing)
+  # Integration
   "jubilant",
-  "pytest-jubilant",
+  "pytest-jubilant>=2",
+  "sh",
   "requests",
   "tenacity",
 ]
@@ -65,7 +61,6 @@ pythonPlatform = "All"
 [tool.pytest.ini_options]
 minversion = "6.0"
 log_cli_level = "INFO"
-asyncio_mode = "auto"
 addopts = "--tb=native --verbose --capture=no --log-cli-level=INFO"
 
 [tool.codespell]
