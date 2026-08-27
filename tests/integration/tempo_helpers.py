@@ -1,10 +1,7 @@
 # Copyright 2026 Canonical Ltd.
 # See LICENSE file for licensing details.
 
-"""Helpers to deploy a monolithic Tempo stack and query ingested traces.
-
-jubilant/sync; kept separate from the OpsTest/async ``helpers.py``.
-"""
+"""Helpers to deploy a monolithic Tempo stack and query ingested traces."""
 
 from typing import List, Set, cast
 
